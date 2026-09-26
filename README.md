@@ -1,8 +1,8 @@
 # x64Emu
 A x64 assembly emulator (assembler + CPU) in TypeScript. [Try it live](https://fromthe.blue/x64Emu/index.html)
 
-![screenshot](ReadmeAttachments\msedge_vyKiGbjzHf.png)
-![screenshot](ReadmeAttachments\runSample%20[x265].mp4)
+![screenshot](ReadmeAttachments/msedge_vyKiGbjzHf.png)
+![screenshot](ReadmeAttachments/runSample%20[x265].mp4)
 
 This Interpreter and Emulator loads an assembly language program and executes it. Written using a modified version of [Long.js](https://github.com/dcodeIO/long.js) to handle working with 64-bit numbers in Javascript, which only handles 54 bit integer operations (The price of having no actual types).
 
@@ -162,9 +162,11 @@ Implemented Instructions
 Most instructions have two parameters (operands) Target and Source.
 When an operation is performed the source and target are read and the operation does what it needs to before placing the result in the Target overwriting what was there. Source remains unchanged.
 A good example would be this:
+```
 MOV ax, 4 ; Move 4 into ax
 MOV bx, 3 ; Move 3 into bx
 ADD ax, bx ; Read 3 from bx and read 4 from ax. Add the two numbers together and place in ax (result 7).
+```
 There are a few that just perform an operation using a single operand (Like INC that adds one to the Target) and a few that can use more than two operands.
 For operations Target Can be a Register or Memory Location. Source can be a Register, Memory Location, or Immidiate value (a number). Source and target cannot both be a memory location.
 This list also includes instructions which are specifically not available to use here. Namely instructions that have been replaced in x64 or that involve privileged operations or threading.
