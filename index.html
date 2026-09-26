@@ -3,12 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <title></title>
-    <!--<script src="https://code.angularjs.org/tools/system.js"></script>-->
     <script src="scripts/ASM.js"></script>
-    <!--<script src="scripts/Tokenizer.js"></script>-->
     <link href="stylesheets/HexEditor.css" rel="stylesheet" />
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
     <script src="scripts/JQuery/jquery.min.js"></script>
     <script src="scripts/JQuery/jquery-ui.js"></script>
     <script src="scripts/TextEditable.js"></script>
@@ -19,8 +15,6 @@
     <link href="stylesheets/Ace.css" rel="stylesheet" />
     <script src="scripts/Ace/ace.js"></script>
     <script src="scripts/Ace/mode-assembly_x86.js"></script>
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/mode-assembly_x86.js"></script>-->
     <link href="stylesheets/ToolTips.css" rel="stylesheet" />
 
     <style>
@@ -51,7 +45,6 @@
                     <li class="ui-state-default" style="min-height: 170px;">
                         <div style="float:left; padding-right: 5px;" class="draggable-element">
                             <h1>Registers</h1>
-                            <!--<div class="tooltip">AAA<span class="tooltiptext tooltip-bottom"><b>AAA</b><br />Operand not valid in 64-bit mode :`(</span></div>-->
                             <table id="tblRegisters" style="column-width: 200px;">
                                 <tr>
                                     <td class="tooltip">RAX: <label id="RAX" data-editable="4" ></label>&nbsp;<label id="EAX" data-editable="2"></label>&nbsp;<label id="AX" data-editable="2"></label><label class="tooltiptext tooltip-right" id="EAXval"></label></td>
@@ -92,13 +85,6 @@
                                                 <!--<td>IF</td>-->
                                                 <td>DF</td>
                                                 <td>OF</td>
-                                                <!--<td>NT</td>-->
-                                                <!--<td>RF</td>-->
-                                                <!--<td>VM</td>-->
-                                                <!--<td>AC</td>-->
-                                                <!--<td>VIF</td>-->
-                                                <!--<td>VIP</td>-->
-                                                <!--<td>ID</td>-->
                                             </tr>
                                             <tr>
                                                 <td><label id="CF" data-editable="1" title="Operation generated a carry or borrow"></label></td>
@@ -141,7 +127,6 @@
                             <img src="images/Hare-32x32.png" alt="Faster" /><br />
                             <select id="lstExamples"></select><button id="btnSelectExample" onclick="loadsample('');">Load</button>
                             <br /><br />
-                            <!--class="codetextarea" spellcheck="false"-->
 <div id="blah">
 .data
 
@@ -194,11 +179,6 @@ END
             </td>
             <td>
                 <ul class="connectedSortable" style="min-height: 500px;">
-                    <!--<li class="ui-state-highlight">Item 1</li>
-                    <li class="ui-state-highlight">Item 2</li>
-                    <li class="ui-state-highlight">Item 3</li>
-                    <li class="ui-state-highlight">Item 4</li>
-                    <li class="ui-state-highlight">Item 5</li>-->
                 </ul>
             </td>
         </tr>
@@ -215,58 +195,9 @@ END
     </table>
 
 
-
-    <!--
-
-
-    <div class="hide-maximized">
-        <div class="minmaxButton"><button onclick="bigBoxCompile();"><img src="images/Restore_full_font_awesome.svg-32x32.png" /></button></div>
-        <select id="lstExamples2"></select><button id="btnSelectExample2" onclick="loadsample(2);">Load</button>
-        <br /><br />
-        <!--<textarea id="blah2" spellcheck="false" class="maximizedtextarea">
-        .data
-
-        ; Data declarations here
-
-        .code
-
-        ; Assembly Code here
-
-        </textarea>
-            class="" contenteditable="true" spellcheck="false"
-            -- >
-
-    <div id="blah2">
-        
-    </div>
-    </div>
-    -->
-
-    <!--<script>
-                //hljs.initHighlightingOnLoad();
-                $("#blah2").on('keyup', function (event) {
-                    $("#blah2Highlight").html(this.innerText);
-                    hljs.highlightBlock($("#blah2Highlight")[0], '  ', false);
-                });
-                $('#blah2').on('scroll', function () {
-                    $('#blah2Highlight').scrollTop($(this).scrollTop());
-                });
-    </script>-->
-
-
-
-
     <script>
         $(document).ready(function () {
             checkWASM();
-
-
-            //$('.draggable-element').arrangeable();
-
-            //var txt = $("#blah2").html();
-            //$("#blah2Highlight").html(txt);
-            //hljs.highlightBlock($("#blah2Highlight")[0], '  ', false);
-
 
             editor = ace.edit("blah");
             editor.setTheme("ace/theme/tomorrow_night_bright");
@@ -320,20 +251,17 @@ END
                 opt.value = opt2.value = i;
                 opt.innerHTML = opt2.innerHTML = s.Title;
                 document.getElementById('lstExamples').appendChild(opt);
-                //document.getElementById('lstExamples2').appendChild(opt2);
             }
             prog = null;
         }
 
         function loadsample(cboNum) {
             editor.setValue(x86samples[$("#lstExamples" + cboNum).val()].Code);
-            //$("#blah2").val(x86samples[$("#lstExamples" + cboNum).val()].Code);
             
             $("#btnRun").text('Run');
             isRunning = false;
             editor.session.clearBreakpoints();
             $("#btnRun").prop("disabled", true);
-            //tokenize();
             prog = null;
         }
 
@@ -345,8 +273,6 @@ END
 
         function bigBoxCompile() {
             $("#codePanel").removeClass("maximized");
-            //$("#blah").val(editor.getValue());
-            //$(".maximized").toggle();
             tokenize();
         }
 
@@ -360,8 +286,6 @@ END
                 $("#codePanel").removeClass("codepanel");
                 $("#codeBoxMinMaxIcon").prop("src", "Images/Restore_full_font_awesome.svg-32x32.png" );
             }
-            //$("#blah2").val($("#blah").val());
-            //$(".maximized").toggle();
         }
 
     </script>
@@ -371,7 +295,7 @@ END
         var prog;
         var isRunning = false;
         var instruction = 0;
-        var highlightColour = "#E78C45"; //"#144852";
+        var highlightColour = "#E78C45";
         var highlightReadColour = "#4EB9C0";
 
         function tokenize() {
@@ -379,7 +303,7 @@ END
             try {
                 isRunning = false;
 
-                var asmscript = editor.getValue(); //document.getElementById('blah').value;
+                var asmscript = editor.getValue();
 
                 prog = new Program(asmscript, preExecute, postExecute, memoryUpdated, memoryRead);
                 addInterruptHandlers(prog, document.getElementById('display0'));
@@ -418,15 +342,9 @@ END
                     var span = $('[data-offset="' + i + '"]');
                     span.css("backgroundColor", "");
                 }
-                //editor.setReadOnly(true);
             }
             catch (e) {
-                //var t = document.getElementById('blah');
-                //if (prog.index < prog.Tokens.length && prog.Tokens[prog.index] != null)
-                //    selectTextareaLine(t, t.value.substr(0, prog.Tokens[prog.index].TokenIndex).split("\n").length);
-
                 $("#btnRun").prop("disabled", true);
-                //editor.setReadOnly(false);
                 alert("Error Compiling!\n" + e.message);
                 editor.gotoLine(prog.GetErrorLine());
             }
@@ -464,9 +382,6 @@ END
         }
 
         function memoryUpdated(offset, value) {
-            //if (1000 - $("#runSpeed").val() == 0)
-            //    return;
-
             offset -= hexEditorBaseOffset;
             if (offset >= 0 && offset <= 255) {
                 var span = $('[data-offset="' + offset + '"]');
@@ -478,19 +393,14 @@ END
         }
 
         function memoryRead(offset, value) {
-            //if (1000 - $("#runSpeed").val() == 0)
-            //    return;
-
             offset -= hexEditorBaseOffset;
             if (offset >= 0 && offset <= 255) {
                 var span = $('[data-offset="' + offset + '"]');
-                //span[0].innerHTML = toPaddedHexString(value, 2);
 
                 var bgColour = span.css("backgroundColor");
 
                 if (bgColour.indexOf("(0, 0, 0") > 0)
                     span.css("background-color", highlightReadColour);
-                //updateStringValue(offset, value);
             }
         }
 
@@ -506,10 +416,6 @@ END
 
             $("span").css("background-color", "");
 
-            //for (var i = 0; i < tokens.length; i++)
-            //    document.getElementById('message').innerHTML += "Root statment: " + prog.Instructions.length + "</br>";
-
-            //try {
             if (prog.Step()) {
                 updateRegisters(prog);
                 if (prog.Instructions[prog.Regs.IP.E] != null && prog.Instructions[prog.Regs.IP.E].Token != null) {
@@ -521,12 +427,7 @@ END
                 alert('End of Program');
                 $("#btnRun").text('Run');
                 $("#btnRun").prop("disabled", true);
-                //editor.setReadOnly(false);
             }
-            //}
-            //catch (e) {
-            //    alert("Error Executing Instruction!\n" + e.message);
-            //}
         }
 
         function runprogram() {
@@ -555,7 +456,6 @@ END
 
             if (isRunning) {
                 if (prog.Step()) {
-                    //document.getElementById("display0").focus();
 
                     if (prog.Instructions[prog.Regs.IP.E] != null && prog.Instructions[prog.Regs.IP.E].Token != null) {
                         var breakpoints = editor.session.getBreakpoints();
@@ -578,7 +478,6 @@ END
                     alert('End of Program');
                     $("#btnRun").text('Run');
                     $("#btnRun").prop("disabled", true);
-                    //editor.setReadOnly(false);
                 }
             }
             updateRegisters(prog);
@@ -588,9 +487,7 @@ END
 
     <script>
         function updateRegisters(program) {
-            //if (1000 - $("#runSpeed").val() == 0)
-            //    return;
-
+            
             formatLabel("RAX", prog.Regs.A.RHigh, 4);
             formatLabel("EAX", prog.Regs.A.EHigh);
             formatLabel("AX", prog.Regs.A.X);
@@ -651,30 +548,17 @@ END
             //document.getElementById('IF').innerHTML = program.Regs.RFlags.IF ? 1 : 0;
             document.getElementById('DF').innerHTML = program.Regs.RFlags.DF ? 1 : 0;
             document.getElementById('OF').innerHTML = program.Regs.RFlags.OF ? 1 : 0;
-            //document.getElementById('NT').innerHTML = program.Regs.RFlags.NT ? 1 : 0;
-            //document.getElementById('RF').innerHTML = program.Regs.RFlags.RF ? 1 : 0;
-            //document.getElementById('VM').innerHTML = program.Regs.RFlags.VM ? 1 : 0;
-            //document.getElementById('AC').innerHTML = program.Regs.RFlags.AC ? 1 : 0;
-            //document.getElementById('VIF').innerHTML = program.Regs.RFlags.VIF ? 1 : 0;
-            //document.getElementById('VIP').innerHTML = program.Regs.RFlags.VIP ? 1 : 0;
-            //document.getElementById('ID').innerHTML = program.Regs.RFlags.ID ? 1 : 0;
         }
 
         function formatLabel(elem, value, size = 2) {
             //https://stackoverflow.com/questions/9909038/formatting-hexadecimal-number-in-javascript
             //var h = ("0000000" + value.toString(16)).substr(-16);
-            //var result = h.substr(0, 4) + ' ' + h.substr(4, 4); // + ' ' + h.substr(12, 4);
-            //var result = toPaddedHexString(value, 8);
             var result = value.toString(16);
 
             var len = result.length;
 
             for (var i = size * 2; i > len; i--)
                 result = "0" + result;
-
-            //result = result.splice(8, 0, " ").splice(13, 0, " ");
-
-            //document.getElementById(elem + 'val').innerHTML = " (" + value + ")"
 
             if (document.getElementById(elem).innerHTML != result) {
                 $("#" + elem).css("background-color", highlightColour);
@@ -736,22 +620,9 @@ END
             return false;
         }
 
-        ///// debugging code
-        //var sel = document.getElementById('lineSelector');
-        //var tarea = ;
-        //sel.onchange = function () {
-        //    selectTextareaLine(document.getElementById('blah'), this.value);
-        //}
-
     </script>
 
     <script>
-        //$('span').bind('click', function () {
-        //    $(this).attr('contentEditable', true);
-        //}).blur(
-        //    function () {
-        //        $(this).attr('contentEditable', false);
-        //    });
         var hexEditorBaseOffset = 0;
 
         //implement plugin
@@ -1128,31 +999,6 @@ END
                 return false;
         })
 
-        //$(document).delegate('#blah', 'keydown', acceptTabs);
-        //$(document).delegate('#blah2', 'keydown', acceptTabs);
-
-        //function acceptTabs(e) {
-        //    var keyCode = e.keyCode || e.which;
-
-        //    if (keyCode == 9) {
-        //        e.preventDefault();
-        //        var start = this.selectionStart;
-        //        var end = this.selectionEnd;
-
-        //        // set textarea value to: text before caret + tab + text after caret
-        //        $(this).val($(this).val().substring(0, start)
-        //            + "\t"
-        //            + $(this).val().substring(end));
-
-        //        // put caret at right position again
-        //        this.selectionStart =
-        //            this.selectionEnd = start + 1;
-        //    }
-        //}
-
-        //$(".connectedSortable").sortable({
-        //    connectWith: ".connectedSortable"
-        //}).disableSelection();
     </script>
 
 </body>
