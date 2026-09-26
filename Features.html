@@ -1,0 +1,650 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Currently Implemented Features</title>
+    <link href="stylesheets/ToolTips.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="scripts/JQuery/jquery.min.js"></script>
+    <script src="scripts/JQuery/jquery-ui.js"></script>
+    <style>
+        body,
+        #mnumonicTechDocs a {
+            background-color: #1E1E1E;
+            color: #DCDCDC;
+        }
+        .ui-tabs-panel a {
+            color: aliceblue !important;
+        }
+
+            .ui-tabs-panel a:visited {
+                color: cyan !important;
+            }
+
+        table td {
+            border: 1px dotted #999999;
+        }
+
+        #mnemonicslist li,
+        #mnemonicsnotimplementedlist li {
+            display: block;
+            width: 10%;
+            float: left;
+        }
+    </style>
+    <style>
+        .ui-tabs-vertical {
+            width: calc(100% - 10px);
+            background-color: #1E1E1E;
+            color: #DCDCDC;
+        }
+
+            .ui-tabs-vertical .ui-tabs-nav {
+                padding: .2em .1em .2em .2em;
+                float: left;
+                width: 20em;
+            }
+
+                .ui-tabs-vertical .ui-tabs-nav li {
+                    clear: left;
+                    width: 100%;
+                    border-bottom-width: 1px !important;
+                    border-right-width: 0 !important;
+                    margin: 0 -1px .2em 0;
+                }
+
+                    .ui-tabs-vertical .ui-tabs-nav li a {
+                        display: block;
+                    }
+
+                    .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active {
+                        padding-bottom: 0;
+                        padding-right: .1em;
+                        border-right-width: 1px;
+                    }
+
+            .ui-tabs-vertical .ui-tabs-panel {
+                padding: 1em;
+                float: right;
+                width: calc(100% - 25em);
+                background-color: #1E1E1E;
+                color: #DCDCDC;
+            }
+    </style>
+    <link href="scripts/Codrops/PopupModals.css" rel="stylesheet" />
+    <script src="scripts/Codrops/ModalEffects.js"></script>
+    <script src="scripts/Features.js"></script>
+    <script>
+        $(function () {
+            $("#tabs").tabs().addClass("ui-tabs-vertical ui-helper-clearfix");
+            $("#tabs li").removeClass("ui-corner-top").addClass("ui-corner-left");
+        });
+    </script>
+</head>
+<body>
+
+    <div id="tabs">
+        <ul>
+            <li><a href="#tabs-intro">Introduction</a></li>
+            <li><a href="#tab-Limitations">Limitations And Bugs</a></li>
+            <li><a href="#tab-CodeView">Code View</a></li>
+            <li><a href="#tab-RegistersView">Registers View</a></li>
+            <li><a href="#tab-MemoryView">Memory View</a></li>
+            <li><a href="#tab-OutputView">Output View</a></li>
+            <li><a href="#tab-VariablesView">Variables View</a></li>
+            <li><a href="#tab-ScreenshotsView">Messages And Screenshots View</a></li>
+            <li><a href="#tab-OperatorsView">Operators</a></li>
+            <li><a href="#tab-KeywordsView">Keywords</a></li>
+            <li><a href="#tab-ImplementedInstructions">Implemented Instructions</a></li>
+            <li><a href="#tab-InstructionsNotImplmenetedYet">Instructions Not Implmeneted Yet</a></li>
+            <li><a href="#tab-Interrupts">Interrupts</a></li>
+            <li><a href="#tab-ExternalAPIS">Implemented External APIS (Win APIs)</a></li>
+            <li><a href="#tab-links">Helpfull links</a></li>
+        </ul>
+        <div id="tabs-intro">
+            <h1>Introduction:</h1>
+            <br />
+            Hello and welcome to my (Tyler Grusendorf) online x64 emulator written in TypeScript (JavaScript)! This emulator is still a work in progress so there might be a few bugs here and there.<br />
+            Understanding computers and how they work is really a passion peice over hobby and if you really want to nerd out check out <a href="http://cpuville.com/Projects/Original-CPU/Original-CPU-home.html" target="_blank">CPUville and Donn's Homemade computer</a>!
+            I've worked to sqush them all but, you know. Regardless there are currently <span id="implementedMnumonicscount"></span> Implemented Instructions.<br />
+            As this is an emulator most Interrupts and Win APIs aren't implemented yet. <br />
+            <br />
+            Take a look at the different sections for descriptions on each section in the emulator.<br />
+
+            My biggest todos right now are making descriptions for each of the implemented instructions and to make up a tutorial to show how assembly works. <br />
+            Lesson 01: Assembly Language... are you a masochist? lol<br />
+            <br />
+            <br />
+            <br />
+            To load pre-built examples:<br />
+            <br />
+            In the Code editor pane select an example from the drop down list and click "Load"<br />
+            Next click "Compile"<br />
+            Finally click "Execute Next" to run one example at a time OR "Run" to run through all instructions.<br />
+            Once the end of the program is reached click "Compile" again to reset or select a new example.<br />
+            
+                        
+            <script>
+                document.getElementById("implementedMnumonicscount").innerHTML = implementedMnumonics.length;
+            </script>
+        </div>
+        <div id="tab-Limitations">
+            <h1>Limitations and Bugs:</h1>
+            Lets start off on the wrong foot! Bugs, Limitations &amp; Problems!<br />
+            <ul>
+                <li>
+                    <s>
+                        Currently the Emulator can only handle 32 bit numbers. It's a limitation of JavaScript as though JavaScript stores numbers as 64 bit floats it can only store
+                        integers in 52 bits and finally JavaScript bitwise operations can only handle 32 bit numbers. It's on my TODO list to work around.
+                    </s><br />
+                    Woot! We're 64-bit capable now. Added <a href="https://github.com/dcodeIO/long.js" target="_blank">Long.js</a> module to handle 64-bit ints. Added R8-R15 registers.<br />
+                    I had to modify some of the module code and make it TypeScript compatible. It added some complexity which means some slow down but for the small purposes of the emulator and how slow it is already I think its fine.
+                </li>
+                <li>Operands on instructions don't check for the correct number during compile. So if you have only one operand on, say, MOV the compiler doesn't care. But when running the program will die.</li>
+                <li>The emulator doesn't care about Memory, Memory operations. In the real world you can't call a "MOV mem, mem" as the processor can't handle memory to memory operations. My emulator will accept this as valid. Don't get into the habit of using this!</li>
+                <li>Instructions aren't stored in the virtual RAM. so you can't directly access, modify, or jump to code addresses at runtime. (Not that you should)</li>
+                <li>Not 100% certain all Instructions below are working esp. when it comes to assigning flags. I thing they are but I make no promises at this point.</li>
+                <li>Virtually no error handing. When an instruction isn't understood correctly the interpreter keeps going so ususally its at the end of stream that an error is thrown.</li>
+                <li>Like assembers be wary of assuming data sizes. Use BYTE, WORD, DWORD keywords for accessing memory locations or you might get weired results!</li>
+                <li>Floating point registers aren't implmented yet.</li>
+                <li>Find something else? <a href="mailto:tyler@fromthe.blue">Let me know!</a></li>
+            </ul>
+        </div>
+        <div id="tab-CodeView">
+            <h2>Code View:</h2>
+            <img src="images/Help/Code Editor.png" />
+            <ul>
+                <li><a href="https://ace.c9.io/">Ace code Editor</a> for syntax highlighting<br /></li>
+                <li>Highlights next instruction to be executed.</li>
+                <li>Clicking on the gutter will insert a breakpoint and the program will pause when it reaches that line.</li>
+                <li>During compile if a syntax error occurs the emulator will attempt to highlight the offending line.</li>
+            </ul>
+        </div>
+        <div id="tab-RegistersView">
+            <h2>Registers:</h2>
+
+            <img src="images/Help/Registers.png" />
+            <ul>
+                <li>Shows the values in the registers.</li>
+                <li>Highlights the register that was modified by the last instruction.</li>
+                <li>
+                    Double clicking on the register value (Except RIP) will allow you to modify the register value. <br />
+                    Editing registers is divided into 3 parts. The Top 32 bits. The mid 16 bits (top half of E) and the lower 16 bits (X).<br />
+                    Input values must be in Hex (0-9 A-F) and case doesn't matter.
+                </li>
+                <li>double clicking on a flag value allows it to be changed as well. Only accepts 1 or 0.</li>
+            </ul>
+
+            <br />
+            A: General Purpose Register<br />
+            B: General Purpose Register<br />
+            C: General Purpose Register<br />
+            D: General Purpose Register<br />
+            SI: General Purpose Register<br />
+            DI: General Purpose Register<br />
+            R8: General Purpose Register<br />
+            R9: General Purpose Register<br />
+            R10: General Purpose Register<br />
+            R11: General Purpose Register<br />
+            R12: General Purpose Register<br />
+            R13: General Purpose Register<br />
+            R14: General Purpose Register<br />
+            R15: General Purpose Register<br />
+            <br />
+            BP: Stack Base Pointer. Stack pointer grows towards 0 from here. Should always use 32 bit reference EBP whan using.<br />
+            SP: Stack Pointer. Should always use 32 bit reference ESP whan using.<br />
+            <br />;
+            IP: Points to the next instruction to be executed. Shouldn't be changed manually in code! (ie don't use "mov EIP, 0x10") Use the flow control instructions. (like JMP mylabel)<br />
+            <br />
+            <br />
+            All Registers can be accessed at different sizes:<br />
+            For instance usinging the "A" register the full 32 bits would be accessed using EAX<br />
+            AX is used for accessing the lower 16 bits<br />
+            AL for the lower byte (8 bits)<br />
+            And finally AH for acessing the higher 8 bits of the lower 16 bits<br />
+            As an example if we have the following hex number in the D register: 0x12345678<br />
+            EDX would return the whole number (0x12345678)<br />
+            DX would return 0x5678<br />
+            DH would return 0x56<br />
+            DL would return 0x78<br />
+            <br />
+            <br />
+            For the extended R registers you can access lower bits using the following:<br />
+            R8 - The full 64-bit register.<br />
+            R8D - D for Double Word (Lower 32-bits)<br />
+            R8W - W for Word (Lower 16-bits)<br />
+            R8B - B for byte (Lowest 8-bits)<br />
+            Notice the only difference between the older registers and the newer R registers is there is no H option to get the lowest high byte (Like AH)<br />
+            <br />
+            <br />
+            Segment registers DS, ES, FS, GS, SS are not used. <br />
+            <h2>Flags</h2>
+            <table>
+                <tr><td>CF:</td><td>Operation generated a carry or borrow</td></tr>
+                <tr><td>PF:</td><td>Last byte has even number of 1's, else 0</td></tr>
+                <tr><td>AF:</td><td>Denotes Binary Coded Decimal in-byte carry</td></tr>
+                <tr><td>ZF:</td><td>Result was 0</td></tr>
+                <tr><td>SF:</td><td>Most significant bit of result is 1</td></tr>
+                <tr><td>DF:</td><td>Direction string instructions operate (increment or decrement)</td></tr>
+                <tr><td>OF:</td><td>Overflow on signed operation</td></tr>
+                <tr><td>AC:</td><td>Alignment check(486SX + only)</td></tr>
+                <tr><td colspan="2">&nbsp;</td><td>
+                <tr><td>ID:</td><td>Changeability denotes presence of CPUID instruction</td></tr>
+                <tr><td colspan="2">&nbsp;</td><td>
+                <tr><td colspan="2">These flags exist but aren't used for anything (and aren't shown):</td></tr>
+                <tr><td>TF:</td><td>Trap flag(single step)</td></tr>
+                <tr><td>IF:</td><td>Interrupt enable flag</td></tr>
+                <tr><td>NT:</td><td>Nested task flag(286 + only), always 1 on 8086 and 186</td></tr>
+                <tr><td>RF:</td><td>Resume flag(386 + only)</td></tr>
+                <tr><td>VM:</td><td>Virtual 8086 mode flag(386 + only)</td></tr>
+                <tr><td>VIF:</td><td>Virtual interrupt flag(Pentium +)</td></tr>
+                <tr><td>VIP:</td><td>Virtual interrupt pending(Pentium +)</td></tr>
+            </table>
+        </div>
+        <div id="tab-MemoryView">
+            <h2>Memory View:</h2>
+            <img src="images/Help/Memory Editor.png" />
+            <ul>
+                <li>Shows the values in memory</li>
+                <li>Can jump to different areas in memory.</li>
+                <li>Hightlights memory that was <span style="background-color: #4EB9C0;">read</span> by last instruction.</li>
+                <li>Highlights memory that was <span style="background-color: #E78C45;">modified</span> by last instruction.</li>
+                <li>Double clicking a cell will allow that byte in memory to be modified.</li>
+                <li>Declared variables in the .data section will start at address 0x10 (16) and will grow towards the end of memory</li>
+                <li>Instructions are stored at 0xA0000. Currently this is a lie and instructions aren't stored in emulator memory</li>
+                <li>Memory is hardcoded to be 0xA00000 bytes long. (10 Mebibytes... ugh Megabytes) </li>
+                <li>The stack starts at 0xA00000 and grows towards 0. The stack can trample other memory if it grows too large.</li>
+            </ul>
+        </div>
+        <div id="tab-OutputView">
+            <h2>Output View:</h2>
+            <ul>
+                <li>When using int 0x21 the output window will appear. This allows for interrupts to emulate dos functions and read chars and write to the screen as though it were a console application.</li>
+                <li>Attempts to make look like a classic DOS screen.</li>
+                <li>When using int 0x4C with a value in AH of 0x1 or 0x7 or 0x8 the output view must be in focus (clicked on) for the emulator to receive input.</li>
+            </ul>
+        </div>
+        <div id="tab-VariablesView">
+            <h2>Variables View:</h2>
+            <ul>
+                <li>Lists the variable name, size, and memory location.</li>
+                <li>TODO: Jump to and highlight memory on double click.</li>
+            </ul>
+        </div>
+        <div id="tab-ScreenshotsView">
+            <h2>Messages and Screenshots:</h2>
+            <ul>
+                <li>int 0x05 - Will save a screenshot of the output view here.</li>
+            </ul>
+        </div>
+        <div id="tab-OperatorsView">
+            <h1>Operators:</h1><br />
+            <table>
+                <tr><td>+</td><td>Adds two values</td></tr>
+                <tr><td>-</td><td>Subtracts right from left</td></tr>
+                <tr><td>*</td><td>Multiplies</td></tr>
+                <tr><td>/</td><td>Divides (Integer Division)</td></tr>
+                <tr><td>MOD</td><td>Remainder of Integer Division</td></tr>
+                <tr><td>EQ</td><td>Equality chack</td></tr>
+                <tr><td>NE</td><td>Not Equal to</td></tr>
+                <tr><td>GT</td><td>Greater than</td></tr>
+                <tr><td>LT</td><td>Less than</td></tr>
+                <tr><td>GE</td><td>Greater than or equal to</td></tr>
+                <tr><td>LE</td><td>Less than or equal to</td></tr>
+                <tr><td>AND</td><td>Bitwise AND</td></tr>
+                <tr><td>OR</td><td>Bitwise OR</td></tr>
+                <tr><td>XOR</td><td>Bitwise XOR</td></tr>
+                <tr><td>NOT</td><td>Bitwise NOT</td></tr>
+                <tr><td>SHL</td><td>Bitwise Shift bits left</td></tr>
+                <tr><td>SHR</td><td>Bitwise Shift bits right</td></tr>
+                <!--<tr><td>.</td><td></td></tr>-->
+                <!--<tr><td>:</td><td>Segment override</td></tr>-->
+                <tr>
+                    <td>LENGTH</td>
+                    <td>
+                        Gets the length (in bytes) of the defined variable.<br />
+                        Eg.<br />
+                        &nbsp;.data<br />
+                        &nbsp;&nbsp;&nbsp;msg db 'Hello $' ; 7 Letters long <br />
+                        &nbsp;.code<br />
+                        &nbsp;&nbsp;&nbsp;mov eax, LENGTH msg ; Puts 7 into EAX <br />
+                    </td>
+                </tr>
+                <tr><td>[ and ]</td><td>Used to get the contents at calcualted memory address of the operation within the parenthesis.</td></tr>
+
+            </table>
+        </div>
+        <div id="tab-KeywordsView">
+            <h1>Keywords:</h1><br />
+            <table>
+                <tr><td>.CODE</td><td>Tells the compiler the next section is code. REQUIRED</td></tr>
+                <tr><td>.DATA</td><td>Tells the compiler the next section is data.</td></tr>
+                <tr><td>BYTE</td><td>Tells the next instruction the value is byte sized.</td></tr>
+                <tr><td>WORD</td><td>Tells the next instruction the value is 2 bytes (Short).</td></tr>
+                <tr><td>DWORD</td><td>Tells the next instruction the value is 4 bytes (An Int).</td></tr>
+                <!--<tr><td>QWORD</td><td>Tells the next instruction the value is 8 bytes</td></tr>
+                <tr><td>PROC</td><td>Tells the compilter this is a local function that can be called</td></tr>
+                <tr><td>ENDP</td><td>Tells the compilter to end the function. Must be preceded byt the RET instruction. It's mostly just eye candy here.</td></tr>
+                <tr><td>PTR</td><td>Gets the Address of the variable rather than the value of.</td></tr>-->
+                <tr><td>DB</td><td>Used in .data to declare variable size of byte.</td></tr>
+                <tr><td>DW</td><td>Used in .data to declare variable size of word (Short). 2-bytes</td></tr>
+                <tr><td>DD</td><td>Used in .data to declare variable size of dword (Int). 4-bytes</td></tr>
+                <!--<tr><td>DF</td><td>Used in .data to declare variable size of 6-bytes (48-bit) integers.</td></tr>-->
+                <tr><td>DQ</td><td>Used in .data to declare variable size of qword (long) (8 bytes).</td></tr>
+                <tr>
+                    <td>DUP</td>
+                    <td>
+                        Used in .data to duplicate data during declaration.<br />
+                        What that means is lets say we have:<br />
+                        data db 0, 0, 0, 0<br />
+                        We can declare this using the dup command:<br />
+                        data db 4 DUP (0)<br />
+                        Which tells the compiler to put 0 valued byte into the data variable 4 times.<br />
+                        This is really useful when you have a large buffer for instance:<br />
+                        buffer db 80 DUP (0)<br />
+                        Will tell the compiler to fill the buffer variable with 80 bytes of zero. <br />
+                        <br />
+                        Format:<br />
+                        &lt;Variable Name&gt; &lt;Data Size (DB, DW, D, or DQ)&gt; &lt;Num of times to duplicate&gt; DUP (&lt;Value&gt;)<br />
+                        &lt;Value&gt; can be any value that fits into the data size. As well at multipule values comma seperated:<br />
+                        data db 4 DUP (0, 1)<br />
+                        Is the same as:<br />
+                        data db 0, 1, 0, 1, 0, 1, 0, 1<br />
+
+                    </td>
+                </tr>
+                <tr><td>END</td><td>End program.</td></tr>
+                <tr><td>EXTRN</td><td>Points to an external function that should be included. See <a href="#externalfunctions">External Functions</a></td></tr>
+                <!--<tr><td>DT</td><td>Used in .data to declare variable size of tword (10 bytes).</td></tr>-->
+                <!--<tr><td>.186</td><td></td></tr>
+                <tr><td>.287</td><td></td></tr>
+                <tr><td>.386</td><td></td></tr>
+                <tr><td>.387</td><td></td></tr>
+                <tr><td>.8086</td><td></td></tr>
+                <tr><td>.8087</td><td></td></tr>
+                <tr><td>.286P</td><td></td></tr>
+                <tr><td>.386P</td><td></td></tr>
+                <tr><td>.ALPHA</td><td></td></tr>-->
+                <!--<tr><td>.CONST</td><td></td></tr>
+                <tr><td>.CREF</td><td></td></tr>-->
+                <!--<tr><td>.DATA?</td><td></td></tr>
+                <tr><td>.ERDIF</td><td></td></tr>
+                <tr><td>.ERR</td><td></td></tr>
+                <tr><td>.ERR1</td><td></td></tr>
+                <tr><td>.ERR2</td><td></td></tr>
+                <tr><td>.ERRB</td><td></td></tr>
+                <tr><td>.ERRDEF</td><td></td></tr>
+                <tr><td>.ERRE</td><td></td></tr>
+                <tr><td>.ERRIDN</td><td></td></tr>
+                <tr><td>.ERRNB</td><td></td></tr>
+                <tr><td>.ERRNDEF</td><td></td></tr>
+                <tr><td>.ERRNZ</td><td></td></tr>
+                <tr><td>.FARDATA</td><td></td></tr>
+                <tr><td>.FARDATA?</td><td></td></tr>
+                <tr><td>.LALL</td><td></td></tr>
+                <tr><td>.LFCOND</td><td></td></tr>
+                <tr><td>.LIST</td><td></td></tr>
+                <tr><td>.MODEL</td><td></td></tr>
+                <tr><td>.RADIX.286</td><td></td></tr>
+                <tr><td>.SALL</td><td></td></tr>
+                <tr><td>.SEQ</td><td></td></tr>
+                <tr><td>.SFCOND</td><td></td></tr>
+                <tr><td>.STACK</td><td></td></tr>
+                <tr><td>.TFCOND</td><td></td></tr>
+                <tr><td>.TYPE</td><td></td></tr>
+                <tr><td>.XALL</td><td></td></tr>
+                <tr><td>.XCREP</td><td></td></tr>
+                <tr><td>.XLIST</td><td></td></tr>
+                <tr><td>@CODE</td><td></td></tr>
+                <tr><td>@CODESIZE</td><td></td></tr>
+                <tr><td>@CURSEG</td><td></td></tr>
+                <tr><td>@DATA</td><td></td></tr>
+                <tr><td>@DATA?</td><td></td></tr>
+                <tr><td>@DATASIZE</td><td></td></tr>
+                <tr><td>@FARDATA</td><td></td></tr>
+                <tr><td>@FARDATA?</td><td></td></tr>
+                <tr><td>@FILENAME</td><td></td></tr>
+                <tr><td>@STACK</td><td></td></tr>
+                <tr><td>@WORDSIZE</td><td></td></tr>
+                <tr><td>%OUT</td><td></td></tr>
+                <tr><td>ALIGN</td><td></td></tr>
+                <tr><td>ASSUME</td><td></td></tr>
+                <tr><td>AT</td><td></td></tr>-->
+                <!--<tr><td>COMM</td><td></td></tr>
+                <tr><td>COMMENT</td><td></td></tr>-->
+                <!--<tr><td>DGROUP</td><td></td></tr>
+                <tr><td>DOSSEG</td><td></td></tr>-->
+                <!---->
+                <!--<tr><td>ELSE</td><td></td></tr>-->
+                <!--<tr><td>ENDIF</td><td></td></tr>
+                <tr><td>ENDM</td><td></td></tr>-->
+                <!--<tr><td>ENDS</td><td></td></tr>
+                <tr><td>EQU</td><td></td></tr>
+                <tr><td>EVEN</td><td></td></tr>
+                <tr><td>EXITM</td><td></td></tr>-->
+                <!--<tr><td>FAR</td><td></td></tr>
+                <tr><td>FWORD</td><td></td></tr>
+                <tr><td>GROUP</td><td></td></tr>
+                <tr><td>HIGH</td><td></td></tr>
+                <tr><td>IF</td><td></td></tr>
+                <tr><td>IF1</td><td></td></tr>
+                <tr><td>IF2</td><td></td></tr>
+                <tr><td>IFB</td><td></td></tr>
+                <tr><td>IFDE</td><td></td></tr>
+                <tr><td>IFDEF</td><td></td></tr>
+                <tr><td>IFGIF</td><td></td></tr>
+                <tr><td>IFIDN</td><td></td></tr>
+                <tr><td>IFNB</td><td></td></tr>
+                <tr><td>IFNDEF</td><td></td></tr>
+                <tr><td>INCLUDE</td><td></td></tr>
+                <tr><td>INCLUDELIB</td><td></td></tr>
+                <tr><td>IRP</td><td></td></tr>
+                <tr><td>IRPC</td><td></td></tr>
+                <tr><td>LABEL</td><td></td></tr>
+                <tr><td>LARGE</td><td></td></tr>-->
+                <!--<tr><td>LOCAL</td><td></td></tr>
+                <tr><td>LOW</td><td></td></tr>
+                <tr><td>MACRO</td><td></td></tr>
+                <tr><td>MASK</td><td></td></tr>
+                <tr><td>MEDIUM</td><td></td></tr>
+                <tr><td>NAME</td><td></td></tr>
+                <tr><td>NEAR</td><td></td></tr>
+                <tr><td>NOTHING</td><td></td></tr>
+                <tr><td>OFFSET</td><td></td></tr>
+                <tr><td>ORG</td><td></td></tr>
+                <tr><td>PAGE</td><td></td></tr>
+                <tr><td>PARA</td><td></td></tr>-->
+                <!--<tr><td>PUBLIC</td><td></td></tr>
+                <tr><td>PURGE</td><td></td></tr>-->
+                <!--<tr><td>RECORD</td><td></td></tr>
+                <tr><td>REPT</td><td></td></tr>
+                <tr><td>SEG</td><td></td></tr>
+                <tr><td>SEGMENT</td><td></td></tr>
+                <tr><td>SHORT</td><td></td></tr>
+                <tr><td>SIZE</td><td></td></tr>
+                <tr><td>SMALL</td><td></td></tr>
+                <tr><td>STACK</td><td></td></tr>
+                <tr><td>STRUC</td><td></td></tr>
+                <tr><td>SUBTTL</td><td></td></tr>
+                <tr><td>TBYTE</td><td></td></tr>
+                <tr><td>THIS</td><td></td></tr>
+                <tr><td>TITLE</td><td></td></tr>
+                <tr><td>TYPE</td><td></td></tr>
+                <tr><td>WIDTH</td><td></td></tr>-->
+
+            </table>
+        </div>
+        <div id="tab-ImplementedInstructions">
+            <h1>Instructions:</h1><br />
+            Most instructions have two parameters (operands) Target and Source.<br />
+            When an operation is performed the source and target are read and the operation does what it needs to before placing the result in the Target overwriting what was there. Source remains unchanged.<br />
+            A good example would be this:<br />
+            MOV ax, 4 ; Move 4 into ax<br />
+            MOV bx, 3 ; Move 3 into bx<br />
+            ADD ax, bx ; Read 3 from bx and read 4 from ax. Add the two numbers together and place in ax (result 7).<br />
+            There are a few that just perform an operation using a single operand (Like INC that adds one to the Target) and a few that can use more than two operands (like ).<br />
+            For operations Target Can be a Register or Memory Location. Source can be a Register, Memory Location, or Immidiate value (a number). Source and target cannot both be a memory location.<br />
+            This list also includes instructions which are specifically not available to use here. Namely instructions that have been replaced in x64 or that involve privileged operations or threading.<br />
+            I'm still working on adding documentation and examples to this section.<br />
+            <div class="md-modal md-effect-14" id="modal-mnemonics">
+                <div class="md-content" style="background-color: #1E1E1E; color: #DCDCDC;">
+                    <h1 id="mnumonicTitle"></h1><br>
+                    <button class="md-close" onclick="removeModalHandler()">Back</button><br /><br /><br />
+                    <div id="mnumonicPopupValue"></div>
+                    <div id="mnumonicVideo"></div><br />
+                    <div id="mnumonicTechDocs"></div>
+                    <div id="mnumonicFurtherReading"></div>
+                    <br><br><br><button class="md-close" onclick="removeModalHandler()">Back</button>
+                </div>
+            </div>
+
+
+            <ul id="mnemonicslist" style="padding-bottom: 55px;"></ul>
+
+            <script>
+                populateMnumonicsList(document.getElementById("mnemonicslist"));
+            </script>
+        </div>
+        <div id="tab-InstructionsNotImplmenetedYet">
+            The following is a list of instructions that aren't implmeneted as of yet.<br />
+            Sweet jesus that's a long list :-S<br />
+            <ul id="mnemonicsnotimplementedlist" style="padding-bottom: 55px;"></ul>
+
+            <script>
+                populateMnumonicsNotImplementedList(document.getElementById("mnemonicsnotimplementedlist"));
+            </script>
+        </div>
+        <div id="tab-Interrupts">
+            <h1>Implemented Interrupts:</h1><br />
+            <table>
+                <tr><td>0x05</td><td>Print Screen</td></tr>
+                <tr><td>0x10</td><td>Video Interrupts</td><td>None Implemented at the moment.</td></tr>
+                <tr>
+                    <td>0x13</td>
+                    <td>Disk Operations<br />(Not Implemented at the moment.)</td>
+                    <td>
+                        
+                        <table>
+                            <tr><td>Value of AH</td><td></td></tr>
+                            <tr><td>0x0</td><td>DISK - RESET DISK SYSTEM</td></tr>
+                            <tr><td>0x1</td><td>DISK - GET STATUS OF LAST OPERATION</td></tr>
+                            <tr><td>0x2</td><td>DISK - READ SECTOR(S) INTO MEMORY</td></tr>
+                            <tr><td>0x3</td><td>DISK - WRITE DISK SECTOR(S)</td></tr>
+                            <tr><td>0x4</td><td>DISK - VERIFY DISK SECTOR(S)</td></tr>
+                            <tr><td></td><td></td></tr>
+                            <tr><td></td><td></td></tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr><td>0x18</td><td>DISKLESS BOOT HOOK - Called when a boot loader can't find the OS.<br />Terminates the running program.</td></tr>
+                <tr>
+                    <td>0x21</td>
+                    <td>DOS Software Interrupt</td>
+                    <td>
+                        <table>
+                            <tr><td>Value of AH</td><td></td></tr>
+                            <tr><td>0x0</td><td>Program terminate.</td></tr>
+                            <tr>
+                                <td>0x1</td>
+                                <td>
+                                    Character input<br />
+                                    Waits for a key to be pressed and then sets AL to the pressed key. <br />
+                                    Echos the pressed key to the screen.
+                                </td>
+                            </tr>
+                            <tr><td>0x02</td><td>Character output. Gets character from DL and writes to screen.</td></tr>
+                            <!--<tr><td>0x03</td><td>Auxiliary input. See: Character input (0x1)</td></tr>
+                            <tr><td>0x04</td><td>Auxiliary output. See: Character output (0x2)</td></tr>
+                            <tr><td>0x05</td><td>Printer output See: Character output (0x2)</td></tr>
+                            <tr><td>0x06</td><td>Direct console I/O</td></tr>-->
+                            <tr>
+                                <td>0x07</td>
+                                <td>
+                                    Direct console input without echo<br />
+                                    Waits for a key to be pressed and then sets AL to the pressed key.
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>0x08</td>
+                                <td>
+                                    Console input without echo<br />
+                                    Waits for a key to be pressed and then sets AL to the pressed key.<br />
+                                    The key is also echoed to the screen.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>0x09</td>
+                                <td>
+                                    Display string<br />
+                                    Gets memory address from DX and reads a string from memory.
+                                    The string must be terminated by a $ character.<br />
+                                </td>
+                            </tr>
+                            <tr>0x4C<td></td><td>Program terminate.</td></tr>
+                            <tr><td></td><td></td></tr>
+                            <tr><td></td><td></td></tr>
+                            <tr><td></td><td></td></tr>
+                            <tr><td></td><td></td></tr>
+                            <tr><td></td><td></td></tr>
+                            <tr><td></td><td></td></tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <!--<h1>Non Implemented Interrupts:</h1><br />
+            <table>
+                <tr><td>0x01</td><td>Not Implemented<br />CPU-generated - SINGLE STEP</td></tr>
+                <tr>
+                    <td>0x02</td>
+                    <td>
+                        Not Implemented.<br />
+                        External hardware - NON-MASKABLE INTERRUPT<br />
+                        Desc: Generated by the CPU when the input to the NMI pin is asserted
+                    </td>
+                </tr>
+                <tr><td>0x03</td><td>Not Implemented<br />CPU-generated - BREAKPOINT</td></tr>
+                <tr><td>0x04</td><td>Not Implemented<br />CPU-generated - INTO DETECTED OVERFLOW</td></tr>
+                <tr><td>0x04</td><td>Not Implemented<br />CPU-generated - INTO DETECTED OVERFLOW</td></tr>
+                <tr><td>0x06</td><td>Not Implemented<br />Invalid opcode Error</td></tr>
+                <tr><td>0x07</td><td>Not Implemented<br />CPU-generated (80286+) - PROCESSOR EXTENSION NOT AVAILABLE</td></tr>
+                <tr><td>0x08</td><td>Not Implemented<br />IRQ0 - SYSTEM TIMER</td></tr>
+                <tr><td>0x09</td><td>Not Implemented<br />IRQ1 - KEYBOARD DATA READY</td></tr>
+            </table>-->
+        </div>
+        <div id="tab-ExternalAPIS">
+            <h1>Implemented External APIS (Win API):</h1><br />
+            Handles System Calls from program.<br />
+            <!--<s>
+                parameters in stdcall	(Microsoft)<br />
+                parameter order on stack is: Right To Left (C style)<br />
+                Stack managed by Callee<br />
+            </s>-->
+            64-Bit Calls to windows functions:<br />
+            <a href="https://en.wikipedia.org/wiki/X86_calling_conventions#Microsoft_x64_calling_convention" target="_blank">Microsoft x64 calling convention</a><br />
+            Registers RCX, RDX, R8, R9 for the first four integer or pointer arguments (in that order)<br />
+            Additional arguments are pushed onto the stack (right to left)<br />
+            Return values placed in EAX<br />
+            <a href="https://en.wikipedia.org/wiki/X86_calling_conventions#stdcall" target="_blank">wikipedia stdcall</a><br />
+            <table>
+                <tr><td>MessageBoxA</td><td>int MessageBoxA(HWND   hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT   uType);</td></tr>
+                <tr><td>ExitProcess</td><td>void ExitProcess(); - Ends the program execution. Does not return.</td></tr>
+            </table>
+        </div>
+        <div id="tab-links">
+            <h1>Helpfull links</h1>
+            <ul>
+                <li><a href="https://stackoverflow.com/a/43774644">A really great stack overflow description of pointers</a></li>
+                <li><a href="https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf">Intel Instruction Manual (PDF)</a></li>
+                <li><a href="https://www.pcjs.org/pubs/pc/reference/microsoft/mspl13/masm/mpguide/">MASM Programmers Guide</a> *Note: This site doesn't fully implement MASM</li>
+                <li><a href="http://angom.myweb.cs.uwindsor.ca/teaching/cs266/MASMReference.pdf">U of Windsor CSCI 240 - Microsoft MASM 6.1 Reference Guide</a></li>
+                <li><a href="https://www.felixcloutier.com/x86/">Felix Cloutier x86 and amd64 instruction reference</a></li>
+                <li><a href="http://www.ctyme.com/rbrown.htm">Ralf Brown's Interrupt List</a> *Note: See implemented interrupts above</li>
+                <li><a href="https://software.intel.com/en-us/articles/introduction-to-x64-assembly?page=1">Intel Developer Zone - Introduction to x64 Assembly</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="md-overlay md-close" onclick="removeModalHandler()"></div>
+</body>
+</html>

@@ -1,0 +1,1159 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <!--<script src="https://code.angularjs.org/tools/system.js"></script>-->
+    <script src="scripts/ASM.js"></script>
+    <!--<script src="scripts/Tokenizer.js"></script>-->
+    <link href="stylesheets/HexEditor.css" rel="stylesheet" />
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
+    <script src="scripts/JQuery/jquery.min.js"></script>
+    <script src="scripts/JQuery/jquery-ui.js"></script>
+    <script src="scripts/TextEditable.js"></script>
+    <script src="scripts/AssemblySamples.js"></script>
+    <script src="scripts/InterruptHandlers.js"></script>
+    <script src="scripts/drag-arrange.min.js"></script>
+
+    <link href="stylesheets/Ace.css" rel="stylesheet" />
+    <script src="scripts/Ace/ace.js"></script>
+    <script src="scripts/Ace/mode-assembly_x86.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/mode-assembly_x86.js"></script>-->
+    <link href="stylesheets/ToolTips.css" rel="stylesheet" />
+
+    <style>
+        a {
+            color: aliceblue;
+        }
+
+        a:visited{
+            color: cyan;
+        }
+    </style>
+</head>
+<body>
+	This is a simple 64-bit Emulator that runs in the web browser (Javascript can only handle 52-bit integers).<br/>
+	To run a program you can either type it into the Code Editor or select an example program from the drop down and click "Load".<br/>
+	Once the program has been written (or loaded). Press the "Compile" button. Here the assembly code is converted to machine code and memory is loaded with the variables from the code. <br />
+	Finally press the "Execute Next" to run one instruction or press "Run" to execute the program.<br />
+	The Slider between the tourtise and the rabbit control how fast the program executes.<br />
+    <a href="Features.html" target="_blank">The Documentation such as it is.</a><br />
+    <div></div>
+
+
+
+    <table style="width: calc(100% - 60px);">
+        <tr>
+            <td colspan="3">
+                <ul class="connectedSortable" style="width: calc(100% - 60px);">
+                    <li class="ui-state-default" style="min-height: 170px;">
+                        <div style="float:left; padding-right: 5px;" class="draggable-element">
+                            <h1>Registers</h1>
+                            <!--<div class="tooltip">AAA<span class="tooltiptext tooltip-bottom"><b>AAA</b><br />Operand not valid in 64-bit mode :`(</span></div>-->
+                            <table id="tblRegisters" style="column-width: 200px;">
+                                <tr>
+                                    <td class="tooltip">RAX: <label id="RAX" data-editable="4" ></label>&nbsp;<label id="EAX" data-editable="2"></label>&nbsp;<label id="AX" data-editable="2"></label><label class="tooltiptext tooltip-right" id="EAXval"></label></td>
+                                    <td class="tooltip">RBX: <label id="RBX" data-editable="4"></label>&nbsp;<label id="EBX" data-editable="2"></label>&nbsp;<label id="BX" data-editable="2"></label><label class="tooltiptext tooltip-right" id="EBXval"></label></td>
+                                    <td class="tooltip">RCX: <label id="RCX" data-editable="4"></label>&nbsp;<label id="ECX" data-editable="2"></label>&nbsp;<label id="CX" data-editable="2"></label><label class="tooltiptext tooltip-right" id="ECXval"></label></td>
+                                    <td class="tooltip">RDX: <label id="RDX" data-editable="4"></label>&nbsp;<label id="EDX" data-editable="2"></label>&nbsp;<label id="DX" data-editable="2"></label><label class="tooltiptext tooltip-right" id="EDXval"></label></td>
+                                </tr>
+                                <tr>
+                                    <td class="tooltip">&nbsp;R8:   <label id="R8" data-editable="4"></label>&nbsp; <label id="R8D" data-editable="2"></label>&nbsp; <label id="R8W" data-editable="2"></label> <label class="tooltiptext tooltip-right" id="R8val"></label></td>
+                                    <td class="tooltip">&nbsp;R9:   <label id="R9" data-editable="4"></label>&nbsp; <label id="R9D" data-editable="2"></label>&nbsp; <label id="R9W" data-editable="2"></label> <label class="tooltiptext tooltip-right" id="R9val"></label></td>
+                                    <td class="tooltip">R10:        <label id="R10" data-editable="4"></label>&nbsp;<label id="R10D" data-editable="2"></label>&nbsp;<label id="R10W" data-editable="2"></label><label class="tooltiptext tooltip-right" id="R10val"></label></td>
+                                    <td class="tooltip">R11: 		<label id="R11" data-editable="4"></label>&nbsp;<label id="R11D" data-editable="2"></label>&nbsp;<label id="R11W" data-editable="2"></label><label class="tooltiptext tooltip-right" id="R11val"></label></td>
+                                </tr>
+                                <tr>
+                                    <td class="tooltip">R12: <label id="R12" data-editable="4"></label>&nbsp;<label id="R12D" data-editable="2"></label>&nbsp;<label id="R12W" data-editable="2"></label><label class="tooltiptext tooltip-right" id="R12val"></label></td>
+                                    <td class="tooltip">R13: <label id="R13" data-editable="4"></label>&nbsp;<label id="R13D" data-editable="2"></label>&nbsp;<label id="R13W" data-editable="2"></label><label class="tooltiptext tooltip-right" id="R13val"></label></td>
+                                    <td class="tooltip">R14: <label id="R14" data-editable="4"></label>&nbsp;<label id="R14D" data-editable="2"></label>&nbsp;<label id="R14W" data-editable="2"></label><label class="tooltiptext tooltip-right" id="R14val"></label></td>
+                                    <td class="tooltip">R15: <label id="R15" data-editable="4"></label>&nbsp;<label id="R15D" data-editable="2"></label>&nbsp;<label id="R15W" data-editable="2"></label><label class="tooltiptext tooltip-right" id="R15val"></label></td>
+                                </tr>
+                                <tr>
+                                    <td class="tooltip">RSI: <label id="RSI" data-editable="4"></label>&nbsp;<label id="ESI" data-editable="2"></label>&nbsp;<label id="SI" data-editable="2"></label><label class="tooltiptext tooltip-right" id="ESIval"></label></td>
+                                    <td class="tooltip">RDI: <label id="RDI" data-editable="4"></label>&nbsp;<label id="EDI" data-editable="2"></label>&nbsp;<label id="DI" data-editable="2"></label><label class="tooltiptext tooltip-right" id="EDIval"></label></td>
+                                    <td class="tooltip">RSP: <label id="RSP" data-editable="4"></label>&nbsp;<label id="ESP" data-editable="2"></label>&nbsp;<label id="SP" data-editable="2"></label><label class="tooltiptext tooltip-right" id="ESPval"></label></td>
+                                    <td class="tooltip">RBP: <label id="RBP" data-editable="4"></label>&nbsp;<label id="EBP" data-editable="2"></label>&nbsp;<label id="BP" data-editable="2"></label><label class="tooltiptext tooltip-right" id="EBPval"></label></td>
+                                </tr>
+                                <tr>
+                                    <td class="tooltip">RIP: <label id="EIP"></label><label class="tooltiptext tooltip-right" id="EIPval"></label></td>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <table id="tblFlags">
+                                            <tr>
+                                                <td>CF</td>
+                                                <td>PF</td>
+                                                <td>AF</td>
+                                                <td>ZF</td>
+                                                <td>SF</td>
+                                                <!--<td>TF</td>-->
+                                                <!--<td>IF</td>-->
+                                                <td>DF</td>
+                                                <td>OF</td>
+                                                <!--<td>NT</td>-->
+                                                <!--<td>RF</td>-->
+                                                <!--<td>VM</td>-->
+                                                <!--<td>AC</td>-->
+                                                <!--<td>VIF</td>-->
+                                                <!--<td>VIP</td>-->
+                                                <!--<td>ID</td>-->
+                                            </tr>
+                                            <tr>
+                                                <td><label id="CF" data-editable="1" title="Operation generated a carry or borrow"></label></td>
+                                                <td><label id="PF" data-editable="1" title="Last byte has even number of 1's, else 0"></label></td>
+                                                <td><label id="AF" data-editable="1" title="Denotes Binary Coded Decimal in-byte carry"></label></td>
+                                                <td><label id="ZF" data-editable="1" title="Result was 0"></label></td>
+                                                <td><label id="SF" data-editable="1" title="Most significant bit of result is 1"></label></td>
+                                                <!--<td><label id="TF" title="Trap flag(single step)	Control"></label></td>-->
+                                                <!--<td><label id="IF" title="Interrupt enable flag	Control	EI(Enable Interrupt)	DI(Disable Interrupt)"></label></td>-->
+                                                <td><label id="DF" data-editable="1" title="Direction string instructions operate (increment or decrement)"></label></td>
+                                                <td><label id="OF" data-editable="1" title="Overflow on signed operation"></label></td>
+                                                <!--<td><label id="NT" title="Nested task flag(286 + only), always 1 on 8086 and 186	System"></label></td>-->
+                                                <!--<td><label id="RF" title="Resume flag(386 + only)	System"></label></td>-->
+                                                <!--<td><label id="VM" title="Virtual 8086 mode flag(386 + only)	System"></label></td>-->
+                                                <!--<td><label id="AC" data-editable="1" title="Alignment check System"></label></td>-->
+                                                <!--<td><label id="VIF" title="VIF	Virtual interrupt flag(Pentium +)	System"></label></td>-->
+                                                <!--<td><label id="VIP" title="VIP	Virtual interrupt pending(Pentium +)	System"></label></td>-->
+                                                <!--<td><label id="ID" title="Changeability denotes presence of CPUID instruction"></label></td>-->
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <ul class="connectedSortable" style="min-height: 500px;">
+                    <li class="ui-state-default" style="min-height: 600px;">
+                        <div style="" class="codepanel draggable-element" id="codePanel">
+                            <h1>Code Editor</h1>
+                            <div class="minmaxButton"><button onclick="maxCodeBox();"><img id="codeBoxMinMaxIcon" src="images/512px-Resize_full_font_awesome.svg-32x32.png" /></button></div>
+                            <button onclick="tokenize();">Compile </button>
+                            <button onclick="executeStep();">Execute Next</button>
+                            <button id="btnRun" onclick="runprogram();">Run</button>
+                            <img src="images/Tortise-32x32.png" alt="Slower" /> <input type="range" min="0" max="1000" value="750" class="slider" id="runSpeed">
+                            <img src="images/Hare-32x32.png" alt="Faster" /><br />
+                            <select id="lstExamples"></select><button id="btnSelectExample" onclick="loadsample('');">Load</button>
+                            <br /><br />
+                            <!--class="codetextarea" spellcheck="false"-->
+<div id="blah">
+.data
+
+variable DQ ?
+
+.code
+
+mov RAX, [variable]
+
+END
+</div>
+                        </div>
+                    </li>
+                </ul>
+            </td>
+            <td>
+                <ul class="connectedSortable" style="min-height: 500px;">
+                    <li class="ui-state-highlight" style="min-height: 500px;">
+                        <div class="hexedit draggable-element">
+                            <h1>Memory Editor</h1>
+                            <input type="text" id="txtJumpToOffset" />&nbsp;<button id="btnJumpToOffset">Go To</button>&nbsp;<button id="btnJumpToZero">Go To 0</button>&nbsp;<button id="btnJumpToSP">Go To SP</button><br /><br />
+                            <table class="hextable">
+                                <tr><td><span data-ptr="0" class="">0000 0000</span></td><td><span data-offset="0" class="">00</span><span data-offset="1" class="">00</span><span data-offset="2" class="">00</span><span data-offset="3" class="">00</span><span data-offset="4" class="">00</span><span data-offset="5" class="">00</span><span data-offset="6" class="">00</span><span data-offset="7" class="">00</span><span data-offset="8" class="">00</span><span data-offset="9" class="">00</span><span data-offset="10" class="">00</span><span data-offset="11" class="">00</span><span data-offset="12" class="">00</span><span data-offset="13" class="">00</span><span data-offset="14" class="">00</span><span data-offset="15" class="">00</span></td><td><span data-str="0" class="">.</span><span data-str="1" class="">.</span><span data-str="2" class="">.</span><span data-str="3" class="">.</span><span data-str="4" class="">.</span><span data-str="5" class="">.</span><span data-str="6" class="">.</span><span data-str="7" class="">.</span><span data-str="8" class="">.</span><span data-str="9" class="">.</span><span data-str="10" class="">.</span><span data-str="11" class="">.</span><span data-str="12" class="">.</span><span data-str="13" class="">.</span><span data-str="14" class="">.</span><span data-str="15" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="1" class="">0000 0010</span></td><td><span data-offset="16" class="">00</span><span data-offset="17" class="">00</span><span data-offset="18" class="">00</span><span data-offset="19" class="">00</span><span data-offset="20" class="">00</span><span data-offset="21" class="">00</span><span data-offset="22" class="">00</span><span data-offset="23" class="">00</span><span data-offset="24" class="">00</span><span data-offset="25" class="">00</span><span data-offset="26" class="">00</span><span data-offset="27" class="">00</span><span data-offset="28" class="">00</span><span data-offset="29" class="">00</span><span data-offset="30" class="">00</span><span data-offset="31" class="">00</span></td><td><span data-str="16" class="">.</span><span data-str="17" class="">.</span><span data-str="18" class="">.</span><span data-str="19" class="">.</span><span data-str="20" class="">.</span><span data-str="21" class="">.</span><span data-str="22" class="">.</span><span data-str="23" class="">.</span><span data-str="24" class="">.</span><span data-str="25" class="">.</span><span data-str="26" class="">.</span><span data-str="27" class="">.</span><span data-str="28" class="">.</span><span data-str="29" class="">.</span><span data-str="30" class="">.</span><span data-str="31" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="2" class="">0000 0020</span></td><td><span data-offset="32" class="">00</span><span data-offset="33" class="">00</span><span data-offset="34" class="">00</span><span data-offset="35" class="">00</span><span data-offset="36" class="">00</span><span data-offset="37" class="">00</span><span data-offset="38" class="">00</span><span data-offset="39" class="">00</span><span data-offset="40" class="">00</span><span data-offset="41" class="">00</span><span data-offset="42" class="">00</span><span data-offset="43" class="">00</span><span data-offset="44" class="">00</span><span data-offset="45" class="">00</span><span data-offset="46" class="">00</span><span data-offset="47" class="">00</span></td><td><span data-str="32" class="">.</span><span data-str="33" class="">.</span><span data-str="34" class="">.</span><span data-str="35" class="">.</span><span data-str="36" class="">.</span><span data-str="37" class="">.</span><span data-str="38" class="">.</span><span data-str="39" class="">.</span><span data-str="40" class="">.</span><span data-str="41" class="">.</span><span data-str="42" class="">.</span><span data-str="43" class="">.</span><span data-str="44" class="">.</span><span data-str="45" class="">.</span><span data-str="46" class="">.</span><span data-str="47" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="3" class="">0000 0030</span></td><td><span data-offset="48" class="">00</span><span data-offset="49" class="">00</span><span data-offset="50" class="">00</span><span data-offset="51" class="">00</span><span data-offset="52" class="">00</span><span data-offset="53" class="">00</span><span data-offset="54" class="">00</span><span data-offset="55" class="">00</span><span data-offset="56" class="">00</span><span data-offset="57" class="">00</span><span data-offset="58" class="">00</span><span data-offset="59" class="">00</span><span data-offset="60" class="">00</span><span data-offset="61" class="">00</span><span data-offset="62" class="">00</span><span data-offset="63" class="">00</span></td><td><span data-str="48" class="">.</span><span data-str="49" class="">.</span><span data-str="50" class="">.</span><span data-str="51" class="">.</span><span data-str="52" class="">.</span><span data-str="53" class="">.</span><span data-str="54" class="">.</span><span data-str="55" class="">.</span><span data-str="56" class="">.</span><span data-str="57" class="">.</span><span data-str="58" class="">.</span><span data-str="59" class="">.</span><span data-str="60" class="">.</span><span data-str="61" class="">.</span><span data-str="62" class="">.</span><span data-str="63" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="4" class="">0000 0040</span></td><td><span data-offset="64" class="">00</span><span data-offset="65" class="">00</span><span data-offset="66" class="">00</span><span data-offset="67" class="">00</span><span data-offset="68" class="">00</span><span data-offset="69" class="">00</span><span data-offset="70" class="">00</span><span data-offset="71" class="">00</span><span data-offset="72" class="">00</span><span data-offset="73" class="">00</span><span data-offset="74" class="">00</span><span data-offset="75" class="">00</span><span data-offset="76" class="">00</span><span data-offset="77" class="">00</span><span data-offset="78" class="">00</span><span data-offset="79" class="">00</span></td><td><span data-str="64" class="">.</span><span data-str="65" class="">.</span><span data-str="66" class="">.</span><span data-str="67" class="">.</span><span data-str="68" class="">.</span><span data-str="69" class="">.</span><span data-str="70" class="">.</span><span data-str="71" class="">.</span><span data-str="72" class="">.</span><span data-str="73" class="">.</span><span data-str="74" class="">.</span><span data-str="75" class="">.</span><span data-str="76" class="">.</span><span data-str="77" class="">.</span><span data-str="78" class="">.</span><span data-str="79" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="5" class="">0000 0050</span></td><td><span data-offset="80" class="">00</span><span data-offset="81" class="">00</span><span data-offset="82" class="">00</span><span data-offset="83" class="">00</span><span data-offset="84" class="">00</span><span data-offset="85" class="">00</span><span data-offset="86" class="">00</span><span data-offset="87" class="">00</span><span data-offset="88" class="">00</span><span data-offset="89" class="">00</span><span data-offset="90" class="">00</span><span data-offset="91" class="">00</span><span data-offset="92" class="">00</span><span data-offset="93" class="">00</span><span data-offset="94" class="">00</span><span data-offset="95" class="">00</span></td><td><span data-str="80" class="">.</span><span data-str="81" class="">.</span><span data-str="82" class="">.</span><span data-str="83" class="">.</span><span data-str="84" class="">.</span><span data-str="85" class="">.</span><span data-str="86" class="">.</span><span data-str="87" class="">.</span><span data-str="88" class="">.</span><span data-str="89" class="">.</span><span data-str="90" class="">.</span><span data-str="91" class="">.</span><span data-str="92" class="">.</span><span data-str="93" class="">.</span><span data-str="94" class="">.</span><span data-str="95" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="6" class="">0000 0060</span></td><td><span data-offset="96" class="">00</span><span data-offset="97" class="">00</span><span data-offset="98" class="">00</span><span data-offset="99" class="">00</span><span data-offset="100" class="">00</span><span data-offset="101" class="">00</span><span data-offset="102" class="">00</span><span data-offset="103" class="">00</span><span data-offset="104" class="">00</span><span data-offset="105" class="">00</span><span data-offset="106" class="">00</span><span data-offset="107" class="">00</span><span data-offset="108" class="">00</span><span data-offset="109" class="">00</span><span data-offset="110" class="">00</span><span data-offset="111" class="">00</span></td><td><span data-str="96" class="">.</span><span data-str="97" class="">.</span><span data-str="98" class="">.</span><span data-str="99" class="">.</span><span data-str="100" class="">.</span><span data-str="101" class="">.</span><span data-str="102" class="">.</span><span data-str="103" class="">.</span><span data-str="104" class="">.</span><span data-str="105" class="">.</span><span data-str="106" class="">.</span><span data-str="107" class="">.</span><span data-str="108" class="">.</span><span data-str="109" class="">.</span><span data-str="110" class="">.</span><span data-str="111" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="7" class="">0000 0070</span></td><td><span data-offset="112" class="">00</span><span data-offset="113" class="">00</span><span data-offset="114" class="">00</span><span data-offset="115" class="">00</span><span data-offset="116" class="">00</span><span data-offset="117" class="">00</span><span data-offset="118" class="">00</span><span data-offset="119" class="">00</span><span data-offset="120" class="">00</span><span data-offset="121" class="">00</span><span data-offset="122" class="">00</span><span data-offset="123" class="">00</span><span data-offset="124" class="">00</span><span data-offset="125" class="">00</span><span data-offset="126" class="">00</span><span data-offset="127" class="">00</span></td><td><span data-str="112" class="">.</span><span data-str="113" class="">.</span><span data-str="114" class="">.</span><span data-str="115" class="">.</span><span data-str="116" class="">.</span><span data-str="117" class="">.</span><span data-str="118" class="">.</span><span data-str="119" class="">.</span><span data-str="120" class="">.</span><span data-str="121" class="">.</span><span data-str="122" class="">.</span><span data-str="123" class="">.</span><span data-str="124" class="">.</span><span data-str="125" class="">.</span><span data-str="126" class="">.</span><span data-str="127" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="8" class="">0000 0080</span></td><td><span data-offset="128" class="">00</span><span data-offset="129" class="">00</span><span data-offset="130" class="">00</span><span data-offset="131" class="">00</span><span data-offset="132" class="">00</span><span data-offset="133" class="">00</span><span data-offset="134" class="">00</span><span data-offset="135" class="">00</span><span data-offset="136" class="">00</span><span data-offset="137" class="">00</span><span data-offset="138" class="">00</span><span data-offset="139" class="">00</span><span data-offset="140" class="">00</span><span data-offset="141" class="">00</span><span data-offset="142" class="">00</span><span data-offset="143" class="">00</span></td><td><span data-str="128" class="">.</span><span data-str="129" class="">.</span><span data-str="130" class="">.</span><span data-str="131" class="">.</span><span data-str="132" class="">.</span><span data-str="133" class="">.</span><span data-str="134" class="">.</span><span data-str="135" class="">.</span><span data-str="136" class="">.</span><span data-str="137" class="">.</span><span data-str="138" class="">.</span><span data-str="139" class="">.</span><span data-str="140" class="">.</span><span data-str="141" class="">.</span><span data-str="142" class="">.</span><span data-str="143" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="9" class="">0000 0090</span></td><td><span data-offset="144" class="">00</span><span data-offset="145" class="">00</span><span data-offset="146" class="">00</span><span data-offset="147" class="">00</span><span data-offset="148" class="">00</span><span data-offset="149" class="">00</span><span data-offset="150" class="">00</span><span data-offset="151" class="">00</span><span data-offset="152" class="">00</span><span data-offset="153" class="">00</span><span data-offset="154" class="">00</span><span data-offset="155" class="">00</span><span data-offset="156" class="">00</span><span data-offset="157" class="">00</span><span data-offset="158" class="">00</span><span data-offset="159" class="">00</span></td><td><span data-str="144" class="">.</span><span data-str="145" class="">.</span><span data-str="146" class="">.</span><span data-str="147" class="">.</span><span data-str="148" class="">.</span><span data-str="149" class="">.</span><span data-str="150" class="">.</span><span data-str="151" class="">.</span><span data-str="152" class="">.</span><span data-str="153" class="">.</span><span data-str="154" class="">.</span><span data-str="155" class="">.</span><span data-str="156" class="">.</span><span data-str="157" class="">.</span><span data-str="158" class="">.</span><span data-str="159" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="10" class="">0000 00A0</span></td><td><span data-offset="160" class="">00</span><span data-offset="161" class="">00</span><span data-offset="162" class="">00</span><span data-offset="163" class="">00</span><span data-offset="164" class="">00</span><span data-offset="165" class="">00</span><span data-offset="166" class="">00</span><span data-offset="167" class="">00</span><span data-offset="168" class="">00</span><span data-offset="169" class="">00</span><span data-offset="170" class="">00</span><span data-offset="171" class="">00</span><span data-offset="172" class="">00</span><span data-offset="173" class="">00</span><span data-offset="174" class="">00</span><span data-offset="175" class="">00</span></td><td><span data-str="160" class="">.</span><span data-str="161" class="">.</span><span data-str="162" class="">.</span><span data-str="163" class="">.</span><span data-str="164" class="">.</span><span data-str="165" class="">.</span><span data-str="166" class="">.</span><span data-str="167" class="">.</span><span data-str="168" class="">.</span><span data-str="169" class="">.</span><span data-str="170" class="">.</span><span data-str="171" class="">.</span><span data-str="172" class="">.</span><span data-str="173" class="">.</span><span data-str="174" class="">.</span><span data-str="175" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="11" class="">0000 00B0</span></td><td><span data-offset="176" class="">00</span><span data-offset="177" class="">00</span><span data-offset="178" class="">00</span><span data-offset="179" class="">00</span><span data-offset="180" class="">00</span><span data-offset="181" class="">00</span><span data-offset="182" class="">00</span><span data-offset="183" class="">00</span><span data-offset="184" class="">00</span><span data-offset="185" class="">00</span><span data-offset="186" class="">00</span><span data-offset="187" class="">00</span><span data-offset="188" class="">00</span><span data-offset="189" class="">00</span><span data-offset="190" class="">00</span><span data-offset="191" class="">00</span></td><td><span data-str="176" class="">.</span><span data-str="177" class="">.</span><span data-str="178" class="">.</span><span data-str="179" class="">.</span><span data-str="180" class="">.</span><span data-str="181" class="">.</span><span data-str="182" class="">.</span><span data-str="183" class="">.</span><span data-str="184" class="">.</span><span data-str="185" class="">.</span><span data-str="186" class="">.</span><span data-str="187" class="">.</span><span data-str="188" class="">.</span><span data-str="189" class="">.</span><span data-str="190" class="">.</span><span data-str="191" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="12" class="">0000 00C0</span></td><td><span data-offset="192" class="">00</span><span data-offset="193" class="">00</span><span data-offset="194" class="">00</span><span data-offset="195" class="">00</span><span data-offset="196" class="">00</span><span data-offset="197" class="">00</span><span data-offset="198" class="">00</span><span data-offset="199" class="">00</span><span data-offset="200" class="">00</span><span data-offset="201" class="">00</span><span data-offset="202" class="">00</span><span data-offset="203" class="">00</span><span data-offset="204" class="">00</span><span data-offset="205" class="">00</span><span data-offset="206" class="">00</span><span data-offset="207" class="">00</span></td><td><span data-str="192" class="">.</span><span data-str="193" class="">.</span><span data-str="194" class="">.</span><span data-str="195" class="">.</span><span data-str="196" class="">.</span><span data-str="197" class="">.</span><span data-str="198" class="">.</span><span data-str="199" class="">.</span><span data-str="200" class="">.</span><span data-str="201" class="">.</span><span data-str="202" class="">.</span><span data-str="203" class="">.</span><span data-str="204" class="">.</span><span data-str="205" class="">.</span><span data-str="206" class="">.</span><span data-str="207" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="13" class="">0000 00D0</span></td><td><span data-offset="208" class="">00</span><span data-offset="209" class="">00</span><span data-offset="210" class="">00</span><span data-offset="211" class="">00</span><span data-offset="212" class="">00</span><span data-offset="213" class="">00</span><span data-offset="214" class="">00</span><span data-offset="215" class="">00</span><span data-offset="216" class="">00</span><span data-offset="217" class="">00</span><span data-offset="218" class="">00</span><span data-offset="219" class="">00</span><span data-offset="220" class="">00</span><span data-offset="221" class="">00</span><span data-offset="222" class="">00</span><span data-offset="223" class="">00</span></td><td><span data-str="208" class="">.</span><span data-str="209" class="">.</span><span data-str="210" class="">.</span><span data-str="211" class="">.</span><span data-str="212" class="">.</span><span data-str="213" class="">.</span><span data-str="214" class="">.</span><span data-str="215" class="">.</span><span data-str="216" class="">.</span><span data-str="217" class="">.</span><span data-str="218" class="">.</span><span data-str="219" class="">.</span><span data-str="220" class="">.</span><span data-str="221" class="">.</span><span data-str="222" class="">.</span><span data-str="223" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="14" class="">0000 00E0</span></td><td><span data-offset="224" class="">00</span><span data-offset="225" class="">00</span><span data-offset="226" class="">00</span><span data-offset="227" class="">00</span><span data-offset="228" class="">00</span><span data-offset="229" class="">00</span><span data-offset="230" class="">00</span><span data-offset="231" class="">00</span><span data-offset="232" class="">00</span><span data-offset="233" class="">00</span><span data-offset="234" class="">00</span><span data-offset="235" class="">00</span><span data-offset="236" class="">00</span><span data-offset="237" class="">00</span><span data-offset="238" class="">00</span><span data-offset="239" class="">00</span></td><td><span data-str="224" class="">.</span><span data-str="225" class="">.</span><span data-str="226" class="">.</span><span data-str="227" class="">.</span><span data-str="228" class="">.</span><span data-str="229" class="">.</span><span data-str="230" class="">.</span><span data-str="231" class="">.</span><span data-str="232" class="">.</span><span data-str="233" class="">.</span><span data-str="234" class="">.</span><span data-str="235" class="">.</span><span data-str="236" class="">.</span><span data-str="237" class="">.</span><span data-str="238" class="">.</span><span data-str="239" class="">.</span></td></tr>
+                                <tr><td><span data-ptr="15" class="">0000 00F0</span></td><td><span data-offset="240" class="">00</span><span data-offset="241" class="">00</span><span data-offset="242" class="">00</span><span data-offset="243" class="">00</span><span data-offset="244" class="">00</span><span data-offset="245" class="">00</span><span data-offset="246" class="">00</span><span data-offset="247" class="">00</span><span data-offset="248" class="">00</span><span data-offset="249" class="">00</span><span data-offset="250" class="">00</span><span data-offset="251" class="">00</span><span data-offset="252" class="">00</span><span data-offset="253" class="">00</span><span data-offset="254" class="">00</span><span data-offset="255" class="">00</span></td><td><span data-str="240" class=""> </span><span data-str="241" class="">.</span><span data-str="242" class="">.</span><span data-str="243" class="">.</span><span data-str="244" class="">.</span><span data-str="245" class="">.</span><span data-str="246" class="">.</span><span data-str="247" class="">.</span><span data-str="248" class="">.</span><span data-str="249" class="">.</span><span data-str="250" class="">.</span><span data-str="251" class="">.</span><span data-str="252" class="">.</span><span data-str="253" class="">.</span><span data-str="254" class="">.</span><span data-str="255" class="">.</span></td></tr>
+                            </table>
+                            <br /><br />
+                        </div>
+                    </li>
+                    <li class="ui-state-highlight" style="min-height: 100px;">
+                        <div style="float:left; padding-right: 5px;" class="draggable-element">
+                            <h1>Display</h1>
+                            <canvas id="display0" width="720px" height="350px" tabindex="1"></canvas>
+                        </div>
+                    </li>
+                </ul>
+            </td>
+            <td>
+                <ul class="connectedSortable" style="min-height: 500px;">
+                    <!--<li class="ui-state-highlight">Item 1</li>
+                    <li class="ui-state-highlight">Item 2</li>
+                    <li class="ui-state-highlight">Item 3</li>
+                    <li class="ui-state-highlight">Item 4</li>
+                    <li class="ui-state-highlight">Item 5</li>-->
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <ul class="connectedSortable" style="width: calc(100% - 60px);">
+                    <li class="ui-state-default"><div class="draggable-element" id="message"><h1>Messages And Screenshots</h1><div class="minmaxButton">Min</div></div></li>
+                    <li class="ui-state-highlight">
+                        <div class="draggable-element" id="vars"><h1>Variable Addresses</h1><div class="minmaxButton">Min</div><select size="10" style="width:300px;" id="varAddresses"></select></div>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+
+
+    <!--
+
+
+    <div class="hide-maximized">
+        <div class="minmaxButton"><button onclick="bigBoxCompile();"><img src="images/Restore_full_font_awesome.svg-32x32.png" /></button></div>
+        <select id="lstExamples2"></select><button id="btnSelectExample2" onclick="loadsample(2);">Load</button>
+        <br /><br />
+        <!--<textarea id="blah2" spellcheck="false" class="maximizedtextarea">
+        .data
+
+        ; Data declarations here
+
+        .code
+
+        ; Assembly Code here
+
+        </textarea>
+            class="" contenteditable="true" spellcheck="false"
+            -- >
+
+    <div id="blah2">
+        
+    </div>
+    </div>
+    -->
+
+    <!--<script>
+                //hljs.initHighlightingOnLoad();
+                $("#blah2").on('keyup', function (event) {
+                    $("#blah2Highlight").html(this.innerText);
+                    hljs.highlightBlock($("#blah2Highlight")[0], '  ', false);
+                });
+                $('#blah2').on('scroll', function () {
+                    $('#blah2Highlight').scrollTop($(this).scrollTop());
+                });
+    </script>-->
+
+
+
+
+    <script>
+        $(document).ready(function () {
+            checkWASM();
+
+
+            //$('.draggable-element').arrangeable();
+
+            //var txt = $("#blah2").html();
+            //$("#blah2Highlight").html(txt);
+            //hljs.highlightBlock($("#blah2Highlight")[0], '  ', false);
+
+
+            editor = ace.edit("blah");
+            editor.setTheme("ace/theme/tomorrow_night_bright");
+            editor.session.setMode("ace/mode/assembly_x86");
+
+            editor.on("guttermousedown", function (e) {
+                var target = e.domEvent.target;
+                if (target.className.indexOf("ace_gutter-cell") == -1)
+                    return;
+                if (!editor.isFocused())
+                    return;
+                if (e.clientX > 25 + target.getBoundingClientRect().left)
+                    return;
+
+
+                var row = e.getDocumentPosition().row;
+
+                var breakpoints = e.editor.session.getBreakpoints();
+
+                if (breakpoints[row] != null)
+                    e.editor.session.clearBreakpoint(row);
+                else {
+                    e.editor.session.setBreakpoint(row);
+                }
+                e.stop()
+            })
+
+            tokenize();
+            loadSamples();
+        });
+
+        function checkWASM() {
+            //Won't run in TypeScript.
+            try {
+                Long.wasm = new WebAssembly.Instance(new WebAssembly.Module(new Uint8Array([
+                    0, 97, 115, 109, 1, 0, 0, 0, 1, 13, 2, 96, 0, 1, 127, 96, 4, 127, 127, 127, 127, 1, 127, 3, 7, 6, 0, 1, 1, 1, 1, 1, 6, 6, 1, 127, 1, 65, 0, 11, 7, 50, 6, 3, 109, 117, 108, 0, 1, 5, 100, 105, 118, 95, 115, 0, 2, 5, 100, 105, 118, 95, 117, 0, 3, 5, 114, 101, 109, 95, 115, 0, 4, 5, 114, 101, 109, 95, 117, 0, 5, 8, 103, 101, 116, 95, 104, 105, 103, 104, 0, 0, 10, 191, 1, 6, 4, 0, 35, 0, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 126, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 127, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 128, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 129, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 130, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11
+                ])), {}).exports;
+            } catch (e) {
+                // no wasm support :(
+            }
+        }
+
+        function loadSamples() {
+            $('#lstExamples').empty();
+            $('#lstExamples2').empty();
+            for (var i = 0; i < x86samples.length; i++) {
+                var s = x86samples[i];
+
+                var opt = document.createElement("option");
+                var opt2 = document.createElement("option");
+                opt.value = opt2.value = i;
+                opt.innerHTML = opt2.innerHTML = s.Title;
+                document.getElementById('lstExamples').appendChild(opt);
+                //document.getElementById('lstExamples2').appendChild(opt2);
+            }
+            prog = null;
+        }
+
+        function loadsample(cboNum) {
+            editor.setValue(x86samples[$("#lstExamples" + cboNum).val()].Code);
+            //$("#blah2").val(x86samples[$("#lstExamples" + cboNum).val()].Code);
+            
+            $("#btnRun").text('Run');
+            isRunning = false;
+            editor.session.clearBreakpoints();
+            $("#btnRun").prop("disabled", true);
+            //tokenize();
+            prog = null;
+        }
+
+    </script>
+
+
+    <script>
+        var editor;
+
+        function bigBoxCompile() {
+            $("#codePanel").removeClass("maximized");
+            //$("#blah").val(editor.getValue());
+            //$(".maximized").toggle();
+            tokenize();
+        }
+
+        function maxCodeBox() {
+            if ($("#codePanel").hasClass("maximized")) {
+                $("#codePanel").removeClass("maximized");
+                $("#codePanel").addClass("codepanel");
+                $("#codeBoxMinMaxIcon").prop("src", "Images/512px-Resize_full_font_awesome.svg-32x32.png");
+            } else {
+                $("#codePanel").addClass("maximized");
+                $("#codePanel").removeClass("codepanel");
+                $("#codeBoxMinMaxIcon").prop("src", "Images/Restore_full_font_awesome.svg-32x32.png" );
+            }
+            //$("#blah2").val($("#blah").val());
+            //$(".maximized").toggle();
+        }
+
+    </script>
+
+
+    <script>
+        var prog;
+        var isRunning = false;
+        var instruction = 0;
+        var highlightColour = "#E78C45"; //"#144852";
+        var highlightReadColour = "#4EB9C0";
+
+        function tokenize() {
+            $("#btnRun").text('Run');
+            try {
+                isRunning = false;
+
+                var asmscript = editor.getValue(); //document.getElementById('blah').value;
+
+                prog = new Program(asmscript, preExecute, postExecute, memoryUpdated, memoryRead);
+                addInterruptHandlers(prog, document.getElementById('display0'));
+                prog.Initilize(asmscript);
+                updateRegisters(prog);
+                
+                $('#varAddresses').empty();
+                for (var i = 0; i < prog.Mem.Variables.length; i++) {
+                    var variable = prog.Mem.Variables[i];
+
+                    var opt = document.createElement("option");
+                    opt.value = variable.Name;
+                    opt.innerHTML = variable.Name + " Addr: " + toPaddedHexString(variable.Address, 8) + " Size: " + variable.Size + " bytes";
+                    document.getElementById('varAddresses').appendChild(opt);
+
+                }
+
+                $("#btnJumpToZero").click();
+
+                if (asmscript.toLowerCase().indexOf("int 0x21") > 0 ||
+                    asmscript.toLowerCase().indexOf("int 33") > 0)
+                    $("#display0").show();
+                else
+                    $("#display0").hide();
+
+                $("#btnRun").prop("disabled", false);
+
+                var currInstruction = prog.Instructions[prog.Regs.IP.E.getLowBits()];
+
+                var lineNumber = editor.getValue().substr(0, currInstruction.Token.TokenIndex).split("\n").length;
+                editor.gotoLine(lineNumber);
+
+                $("#btnJumpToZero").click();
+
+                for (var i = 0; i < 256; i++) {
+                    var span = $('[data-offset="' + i + '"]');
+                    span.css("backgroundColor", "");
+                }
+                //editor.setReadOnly(true);
+            }
+            catch (e) {
+                //var t = document.getElementById('blah');
+                //if (prog.index < prog.Tokens.length && prog.Tokens[prog.index] != null)
+                //    selectTextareaLine(t, t.value.substr(0, prog.Tokens[prog.index].TokenIndex).split("\n").length);
+
+                $("#btnRun").prop("disabled", true);
+                //editor.setReadOnly(false);
+                alert("Error Compiling!\n" + e.message);
+                editor.gotoLine(prog.GetErrorLine());
+            }
+        }
+
+        function preExecute(instruction) {
+            ////if (1000 - $("#runSpeed").val() == 0)
+            ////    return;
+
+            //if (!instruction || !instruction.Token)
+            //    return;
+
+            //var lineNumber = editor.getValue().substr(0, instruction.Token.TokenIndex).split("\n").length;
+            //editor.gotoLine(lineNumber+1);
+
+
+            ////var t = document.getElementById('blah');
+            ////if (instruction.Token != null)
+            ////    selectTextareaLine(t, t.value.substr(0, instruction.Token.TokenIndex).split("\n").length);
+        }
+
+        function postExecute(instruction, result) {
+            //if (1000 - $("#runSpeed").val() == 0)
+            //    return;
+            //if (!instruction || !instruction.Token)
+            //    return;
+
+            
+            //var lineNumber = editor.getValue().substr(0, instruction.Token.TokenIndex).split("\n").length;
+            //editor.gotoLine(lineNumber);
+
+            //var t = document.getElementById('blah');
+            //if (instruction.Token != null)
+            //    selectTextareaLine(t, t.value.substr(0, instruction.Token.TokenIndex).split("\n").length);
+        }
+
+        function memoryUpdated(offset, value) {
+            //if (1000 - $("#runSpeed").val() == 0)
+            //    return;
+
+            offset -= hexEditorBaseOffset;
+            if (offset >= 0 && offset <= 255) {
+                var span = $('[data-offset="' + offset + '"]');
+                span[0].innerHTML = toPaddedHexString(value, 2);
+
+                span.css("background-color", highlightColour);
+                updateStringValue(offset, value);
+            }
+        }
+
+        function memoryRead(offset, value) {
+            //if (1000 - $("#runSpeed").val() == 0)
+            //    return;
+
+            offset -= hexEditorBaseOffset;
+            if (offset >= 0 && offset <= 255) {
+                var span = $('[data-offset="' + offset + '"]');
+                //span[0].innerHTML = toPaddedHexString(value, 2);
+
+                var bgColour = span.css("backgroundColor");
+
+                if (bgColour.indexOf("(0, 0, 0") > 0)
+                    span.css("background-color", highlightReadColour);
+                //updateStringValue(offset, value);
+            }
+        }
+
+        function executeStep() {
+            if (prog == null)
+                tokenize();
+
+            if (prog == null) {
+                alert('Cannot Run: Compile Error!');
+                return;
+            }
+
+
+            $("span").css("background-color", "");
+
+            //for (var i = 0; i < tokens.length; i++)
+            //    document.getElementById('message').innerHTML += "Root statment: " + prog.Instructions.length + "</br>";
+
+            //try {
+            if (prog.Step()) {
+                updateRegisters(prog);
+                if (prog.Instructions[prog.Regs.IP.E] != null && prog.Instructions[prog.Regs.IP.E].Token != null) {
+                    var lineNumber = editor.getValue().substr(0, prog.Instructions[prog.Regs.IP.E].Token.TokenIndex).split("\n").length;
+                    editor.gotoLine(lineNumber);
+                }
+            }
+            else {
+                alert('End of Program');
+                $("#btnRun").text('Run');
+                $("#btnRun").prop("disabled", true);
+                //editor.setReadOnly(false);
+            }
+            //}
+            //catch (e) {
+            //    alert("Error Executing Instruction!\n" + e.message);
+            //}
+        }
+
+        function runprogram() {
+            if (prog == null)
+                tokenize();
+
+            if (prog == null) {
+                alert('Cannot Run: Compile Error!');
+                return;
+            }
+
+            if (!isRunning) {
+                document.getElementById("display0").focus();
+                setTimeout(timeStep, 1000 - $("#runSpeed").val());
+                isRunning = true;
+                $("#btnRun").text('Pause');
+            }
+            else {
+                isRunning = false;
+                $("#btnRun").text('Resume');
+            }
+        }
+
+        function timeStep() {
+            $("span").css("background-color", "");
+
+            if (isRunning) {
+                if (prog.Step()) {
+                    //document.getElementById("display0").focus();
+
+                    if (prog.Instructions[prog.Regs.IP.E] != null && prog.Instructions[prog.Regs.IP.E].Token != null) {
+                        var breakpoints = editor.session.getBreakpoints();
+                        var lineNumber = editor.getValue().substr(0, prog.Instructions[prog.Regs.IP.E].Token.TokenIndex).split("\n").length;
+
+                        editor.gotoLine(lineNumber); //Breakpoints are 0 based but line nums are 1 based. 
+                        if (breakpoints[lineNumber - 1] != null) {
+                            isRunning = false;
+                            $("#btnRun").text('Run');
+                            $("#btnRun").prop("disabled", false);
+                        }
+                        else {
+                            setTimeout(timeStep, 1000 - $("#runSpeed").val());
+                        }
+                    }
+                    else
+                        setTimeout(timeStep, 1000 - $("#runSpeed").val());
+                }
+                else {
+                    alert('End of Program');
+                    $("#btnRun").text('Run');
+                    $("#btnRun").prop("disabled", true);
+                    //editor.setReadOnly(false);
+                }
+            }
+            updateRegisters(prog);
+        }
+
+    </script>
+
+    <script>
+        function updateRegisters(program) {
+            //if (1000 - $("#runSpeed").val() == 0)
+            //    return;
+
+            formatLabel("RAX", prog.Regs.A.RHigh, 4);
+            formatLabel("EAX", prog.Regs.A.EHigh);
+            formatLabel("AX", prog.Regs.A.X);
+            formatLabel("RBX", prog.Regs.B.RHigh, 4);
+            formatLabel("EBX", prog.Regs.B.EHigh);
+            formatLabel("BX", prog.Regs.B.X);
+            formatLabel("RCX", prog.Regs.C.RHigh, 4);
+            formatLabel("ECX", prog.Regs.C.EHigh);
+            formatLabel("CX", prog.Regs.C.X);
+            formatLabel("RDX", prog.Regs.D.RHigh, 4);
+            formatLabel("EDX", prog.Regs.D.EHigh);
+            formatLabel("DX", prog.Regs.D.X);
+            formatLabel("R8", prog.Regs.R8.RHigh, 4);
+            formatLabel("R8D", prog.Regs.R8.EHigh);
+            formatLabel("R8W", prog.Regs.R8.W);
+            formatLabel("R9", prog.Regs.R9.RHigh, 4);
+            formatLabel("R9D", prog.Regs.R9.EHigh);
+            formatLabel("R9W", prog.Regs.R9.W);
+            formatLabel("R10", prog.Regs.R10.RHigh, 4);
+            formatLabel("R10D", prog.Regs.R10.EHigh);
+            formatLabel("R10W", prog.Regs.R10.W);
+            formatLabel("R11", prog.Regs.R11.RHigh, 4);
+            formatLabel("R11D", prog.Regs.R11.EHigh);
+            formatLabel("R11W", prog.Regs.R11.W);
+            formatLabel("R12", prog.Regs.R12.RHigh, 4);
+            formatLabel("R12D", prog.Regs.R12.EHigh);
+            formatLabel("R12W", prog.Regs.R12.W);
+            formatLabel("R13", prog.Regs.R13.RHigh, 4);
+            formatLabel("R13D", prog.Regs.R13.EHigh);
+            formatLabel("R13W", prog.Regs.R13.W);
+            formatLabel("R14", prog.Regs.R14.RHigh, 4);
+            formatLabel("R14D", prog.Regs.R14.EHigh);
+            formatLabel("R14W", prog.Regs.R14.W);
+            formatLabel("R15", prog.Regs.R15.RHigh, 4);
+            formatLabel("R15D", prog.Regs.R15.EHigh);
+            formatLabel("R15W", prog.Regs.R15.W);
+            formatLabel("RSI", prog.Regs.SI.RHigh, 4);
+            formatLabel("ESI", prog.Regs.SI.EHigh);
+            formatLabel("SI", prog.Regs.SI.X);
+            formatLabel("RDI", prog.Regs.DI.RHigh, 4);
+            formatLabel("EDI", prog.Regs.DI.EHigh);
+            formatLabel("DI", prog.Regs.DI.X);
+            formatLabel("RSP", prog.Regs.SP.RHigh, 4);
+            formatLabel("ESP", prog.Regs.SP.EHigh);
+            formatLabel("SP", prog.Regs.SP.X);
+            formatLabel("RBP", prog.Regs.BP.RHigh, 4);
+            formatLabel("EBP", prog.Regs.BP.EHigh);
+            formatLabel("BP", prog.Regs.BP.X);
+
+            formatLabel('EIP', program.Regs.IP.R, 8);
+            
+            document.getElementById('CF').innerHTML = program.Regs.RFlags.CF ? 1 : 0;
+            document.getElementById('PF').innerHTML = program.Regs.RFlags.PF ? 1 : 0;
+            document.getElementById('AF').innerHTML = program.Regs.RFlags.AF ? 1 : 0;
+            document.getElementById('ZF').innerHTML = program.Regs.RFlags.ZF ? 1 : 0;
+            document.getElementById('SF').innerHTML = program.Regs.RFlags.SF ? 1 : 0;
+            //document.getElementById('TF').innerHTML = program.Regs.RFlags.TF ? 1 : 0;
+            //document.getElementById('IF').innerHTML = program.Regs.RFlags.IF ? 1 : 0;
+            document.getElementById('DF').innerHTML = program.Regs.RFlags.DF ? 1 : 0;
+            document.getElementById('OF').innerHTML = program.Regs.RFlags.OF ? 1 : 0;
+            //document.getElementById('NT').innerHTML = program.Regs.RFlags.NT ? 1 : 0;
+            //document.getElementById('RF').innerHTML = program.Regs.RFlags.RF ? 1 : 0;
+            //document.getElementById('VM').innerHTML = program.Regs.RFlags.VM ? 1 : 0;
+            //document.getElementById('AC').innerHTML = program.Regs.RFlags.AC ? 1 : 0;
+            //document.getElementById('VIF').innerHTML = program.Regs.RFlags.VIF ? 1 : 0;
+            //document.getElementById('VIP').innerHTML = program.Regs.RFlags.VIP ? 1 : 0;
+            //document.getElementById('ID').innerHTML = program.Regs.RFlags.ID ? 1 : 0;
+        }
+
+        function formatLabel(elem, value, size = 2) {
+            //https://stackoverflow.com/questions/9909038/formatting-hexadecimal-number-in-javascript
+            //var h = ("0000000" + value.toString(16)).substr(-16);
+            //var result = h.substr(0, 4) + ' ' + h.substr(4, 4); // + ' ' + h.substr(12, 4);
+            //var result = toPaddedHexString(value, 8);
+            var result = value.toString(16);
+
+            var len = result.length;
+
+            for (var i = size * 2; i > len; i--)
+                result = "0" + result;
+
+            //result = result.splice(8, 0, " ").splice(13, 0, " ");
+
+            //document.getElementById(elem + 'val').innerHTML = " (" + value + ")"
+
+            if (document.getElementById(elem).innerHTML != result) {
+                $("#" + elem).css("background-color", highlightColour);
+            }
+            else {
+                $("#" + elem).css("background-color", "");
+            }
+            document.getElementById(elem).innerHTML = result;
+        }
+
+        String.prototype.splice = function (idx, rem, str) {
+            return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
+        };
+    </script>
+
+    <script>
+        function selectTextareaLine(tarea, lineNum) {
+            //http://jsfiddle.net/5enfp/
+            //https://stackoverflow.com/questions/13650534/how-to-select-line-of-text-in-textarea
+            lineNum--; // array starts at 0
+            var lines = tarea.value.split("\n");
+
+            // calculate start/end
+            var startPos = 0, endPos = tarea.value.length;
+            for (var x = 0; x < lines.length; x++) {
+                if (x == lineNum) {
+                    break;
+                }
+                startPos += (lines[x].length + 1);
+
+            }
+
+            var endPos = lines[lineNum].length + startPos;
+
+            // do selection
+            // Chrome / Firefox
+
+            if (typeof (tarea.selectionStart) != "undefined") {
+                tarea.focus();
+                tarea.selectionStart = startPos;
+                tarea.selectionEnd = endPos;
+                $.event.trigger({ type: 'keypress' });
+                return true;
+            }
+
+            // IE
+            if (document.selection && document.selection.createRange) {
+                tarea.focus();
+                tarea.select();
+                var range = document.selection.createRange();
+                range.collapse(true);
+                range.moveEnd("character", endPos);
+                range.moveStart("character", startPos);
+                range.select();
+                $.event.trigger({ type: 'keypress' });
+                return true;
+            }
+
+            return false;
+        }
+
+        ///// debugging code
+        //var sel = document.getElementById('lineSelector');
+        //var tarea = ;
+        //sel.onchange = function () {
+        //    selectTextareaLine(document.getElementById('blah'), this.value);
+        //}
+
+    </script>
+
+    <script>
+        //$('span').bind('click', function () {
+        //    $(this).attr('contentEditable', true);
+        //}).blur(
+        //    function () {
+        //        $(this).attr('contentEditable', false);
+        //    });
+        var hexEditorBaseOffset = 0;
+
+        //implement plugin
+        $('span').editable().on('editsubmit', function (event, val) {
+            var offset = parseInt(event.target.attributes["data-offset"].value);
+            var value = parseInt(val, 16);
+
+            prog.Mem.WriteMemory1Byte(hexEditorBaseOffset + offset, value);
+
+
+
+            val = toPaddedHexString(value, 2);
+            event.target.innerHTML = val;
+            console.log('box ' + offset + ' text changed to ' + val);
+
+            updateStringValue(offset, value);
+
+        });
+
+        $('label[data-editable="2"]').editable(44, 4).on('editsubmit', updateRegisterValue);
+        $('label[data-editable="4"]').editable(88, 8).on('editsubmit', updateRegisterValue);
+        $('label[data-editable="1"]').editable(22, 1).on('editsubmit', updateFlagValue);
+
+        function updateRegisterValue(event, val){
+            var value = parseInt(val, 16);
+            var size = 4;
+
+            switch (event.currentTarget.id) {
+                case "RAX":
+                    prog.Regs.A.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "EAX":
+                    prog.Regs.A.EHigh = new Long(value);
+                    break;
+
+                case "AX":
+                    prog.Regs.A.X = new Long(value);
+                    break;
+
+                case "RBX":
+                    prog.Regs.A.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "EBX":
+                    prog.Regs.B.EHigh = new Long(value);
+                    break;
+
+                case "BX":
+                    prog.Regs.B.X = new Long(value);
+                    break;
+
+                case "RCX":
+                    prog.Regs.C.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "ECX":
+                    prog.Regs.C.EHigh = new Long(value);
+                    break;
+
+                case "CX":
+                    prog.Regs.C.X = new Long(value);
+                    break;
+
+                case "RDX":
+                    prog.Regs.D.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "EDX":
+                    prog.Regs.D.EHigh = new Long(value);
+                    break;
+
+                case "DX":
+                    prog.Regs.D.X = new Long(value);
+                    break;
+
+                case "R8":
+                    prog.Regs.R8.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "R8D":
+                    prog.Regs.R8.EHigh = new Long(value);
+                    break;
+
+                case "R8W":
+                    prog.Regs.R8.W = new Long(value);
+                    break;
+
+                case "R9":
+                    prog.Regs.R9.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "R9D":
+                    prog.Regs.R9.EHigh = new Long(value);
+                    break;
+
+                case "R9W":
+                    prog.Regs.R9.W = new Long(value);
+                    break;
+
+                case "R10":
+                    prog.Regs.R10.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "R10D":
+                    prog.Regs.R10.EHigh = new Long(value);
+                    break;
+
+                case "R10W":
+                    prog.Regs.R10.W = new Long(value);
+                    break;
+
+                case "R11":
+                    prog.Regs.R11.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "R11D":
+                    prog.Regs.R11.EHigh = new Long(value);
+                    break;
+
+                case "R11W":
+                    prog.Regs.R11.W = new Long(value);
+                    break;
+
+                case "R12":
+                    prog.Regs.R12.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "R12D":
+                    prog.Regs.R12.EHigh = new Long(value);
+                    break;
+
+                case "R12W":
+                    prog.Regs.R12.W = new Long(value);
+                    break;
+
+                case "R13":
+                    prog.Regs.R13.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "R13D":
+                    prog.Regs.R13.EHigh = new Long(value);
+                    break;
+
+                case "R13W":
+                    prog.Regs.R13.W = new Long(value);
+                    break;
+
+                case "R14":
+                    prog.Regs.R14.W = new Long(value);
+                    size = 8;
+                    break;
+
+                case "R14D":
+                    prog.Regs.R14.EHigh = new Long(value);
+                    break;
+
+                case "R14W":
+                    prog.Regs.R14.W = new Long(value);
+                    break;
+
+                case "R15":
+                    prog.Regs.R15.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "R15D":
+                    prog.Regs.R15.EHigh = new Long(value);
+                    break;
+
+                case "R15W":
+                    prog.Regs.R15.W = new Long(value);
+                    break;
+
+
+                case "RSI":
+                    prog.Regs.SI.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "ESI":
+                    prog.Regs.SI.EHigh = new Long(value);
+                    break;
+
+                case "SI":
+                    prog.Regs.SI.X = new Long(value);
+                    break;
+
+                case "RDI":
+                    prog.Regs.DI.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "EDI":
+                    prog.Regs.DI.EHigh = new Long(value);
+                    break;
+
+                case "DI":
+                    prog.Regs.DI.X = new Long(value);
+                    break;
+
+                case "RSP":
+                    prog.Regs.SP.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "ESP":
+                    prog.Regs.SP.EHigh = new Long(value);
+                    break;
+
+                case "SP":
+                    prog.Regs.SP.X = new Long(value);
+                    break;
+
+                case "RBP":
+                    prog.Regs.BP.RHigh = new Long(value);
+                    size = 8;
+                    break;
+
+                case "EBP":
+                    prog.Regs.BP.EHigh = new Long(value);
+                    break;
+
+                case "BP":
+                    prog.Regs.BP.X = new Long(value);
+                    break;
+            }
+
+            val = toPaddedHexString(value, size);
+            event.target.innerHTML = val;
+
+        }
+
+        function updateFlagValue(event, val) {
+            var value = parseInt(val, 16);
+
+            var orig = event.target.innerHTML;
+
+            if (value == 1 || value == 0) {
+                if (value == 1)
+                    value = true;
+                else
+                    value = false;
+
+                switch (event.currentTarget.id) {
+                    case "CF":
+                        prog.Regs.RFlags.CF = value;
+                        break;
+                    case "PF":
+                        prog.Regs.RFlags.PF = value;
+                        break;
+                    case "AF":
+                        prog.Regs.RFlags.AF = value;
+                        break;
+                    case "ZF":
+                        prog.Regs.RFlags.ZF = value;
+                        break;
+                    case "SF":
+                        prog.Regs.RFlags.SF = value;
+                        break;
+                    case "DF":
+                        prog.Regs.RFlags.DF = value;
+                        break;
+                    case "OF":
+                        prog.Regs.RFlags.OF = value;
+                        break;
+                }
+                event.target.innerHTML = val ? "1" : "0";
+            }
+            else {
+                switch (event.currentTarget.id) {
+                    case "CF":
+                        event.target.innerHTML = prog.Regs.RFlags.CF ? "1" : "0";
+                        break;
+                    case "PF":
+                        event.target.innerHTML = prog.Regs.RFlags.PF ? "1" : "0";
+                        break;
+                    case "AF":
+                        event.target.innerHTML = prog.Regs.RFlags.AF ? "1" : "0";
+                        break;
+                    case "ZF":
+                        event.target.innerHTML = prog.Regs.RFlags.ZF ? "1" : "0";
+                        break;
+                    case "SF":
+                        event.target.innerHTML = prog.Regs.RFlags.SF ? "1" : "0";
+                        break;
+                    case "DF":
+                        event.target.innerHTML = prog.Regs.RFlags.DF ? "1" : "0";
+                        break;
+                    case "OF":
+                        event.target.innerHTML = prog.Regs.RFlags.OF ? "1" : "0";
+                        break;
+                }
+            }
+}
+
+        function updateStringValue(offset, val) {
+            var span = $('[data-str="' + offset + '"]');
+
+            if (val < 31 || val == 127)
+                val = 46;
+
+
+            span[0].innerHTML = String.fromCharCode(val);
+        }
+
+        $("#btnJumpToZero").click(function () {
+            $("#txtJumpToOffset").val(0);
+            $("#btnJumpToOffset").click();
+        });
+        $("#btnJumpToSP").click(function () {
+            if (prog == null || prog.Regs == null)
+                return;
+
+            $("#txtJumpToOffset").val(toPaddedHexString(prog.Regs.SP.E, 8));
+            $("#btnJumpToOffset").click();
+        });
+
+        $("#btnJumpToOffset").click(function () {
+
+            if (prog == null || prog.Mem == null || prog.Mem.memory == null || prog.Mem.memory.length == 0)
+                return;
+
+            var offset = $("#txtJumpToOffset").val();
+            offset = parseInt(offset, 16);
+
+            if (offset < 0)
+                offset = 0;
+            if (offset > 10485504)
+                offset = 10485504;
+            hexEditorBaseOffset = offset;
+
+            $("#txtJumpToOffset").val(toPaddedHexString(offset, 8));
+
+            for (var i = 0; i < 16; i++) {
+                var offsetptr = $('[data-ptr="' + i + '"]');
+                offsetptr[0].innerHTML = toPaddedHexString(offset + (i * 16), 2);
+            }
+
+            for (var i = 0; i < 256; i++) {
+                var value = prog.Mem.ReadMemory1Byte(offset + i);
+                var span = $('[data-offset="' + i + '"]');
+                span[0].innerHTML = toPaddedHexString(value, 2);
+
+                updateStringValue(i, value);
+                span.css("backgroundColor", "");
+
+            }
+        });
+        $("#txtJumpToOffset").bind('keypress', function (e) {
+            var code = e.keyCode ? e.keyCode : e.which;
+            if (code === 13) {
+                $("#btnJumpToOffset").click();
+            }
+            //https://stackoverflow.com/questions/16052592/javascript-prevent-default-for-keyup
+            if ((code >= 48 && code <= 57) || (code >= 65 && code <= 70)) {
+                return true;
+            }
+            else if (code >= 97 && code <= 102) {
+                e.keyCode = code - 49;
+                return true;
+            }
+            else
+                return false;
+        })
+
+        //$(document).delegate('#blah', 'keydown', acceptTabs);
+        //$(document).delegate('#blah2', 'keydown', acceptTabs);
+
+        //function acceptTabs(e) {
+        //    var keyCode = e.keyCode || e.which;
+
+        //    if (keyCode == 9) {
+        //        e.preventDefault();
+        //        var start = this.selectionStart;
+        //        var end = this.selectionEnd;
+
+        //        // set textarea value to: text before caret + tab + text after caret
+        //        $(this).val($(this).val().substring(0, start)
+        //            + "\t"
+        //            + $(this).val().substring(end));
+
+        //        // put caret at right position again
+        //        this.selectionStart =
+        //            this.selectionEnd = start + 1;
+        //    }
+        //}
+
+        //$(".connectedSortable").sortable({
+        //    connectWith: ".connectedSortable"
+        //}).disableSelection();
+    </script>
+
+</body>
+</html>

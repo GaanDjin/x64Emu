@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    //"module": "system",
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es5"
+    //"outFile": "ASM.js"
+  },
+  "exclude": [
+    "node_modules",
+    "wwwroot"
+  ],
+  "files": [
+    "./ASM.ts" //,
+    //"ASMInstructions.ts",
+    //"AST.ts",
+    //"Operator.ts",
+    //"ProcessorEmulator.ts",
+    //"./Tokenizer.ts"
+  ],
+  "compileOnSave": true
+}
