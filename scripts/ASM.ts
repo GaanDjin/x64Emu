@@ -1,7 +1,22 @@
-﻿function trunc(v: number): number {
+﻿
+/**
+ * Truncate a number to a whole value. This will Floor a +ve number and Ceiling a -ve number. (Rounded towards zero)
+ * 
+ * @param v - The value to truncate.
+ *
+ * @returns The value with the decimal removed.  
+*/
+function trunc(v: number): number {
     return v < 0 ? Math.ceil(v) : Math.floor(v);
 }
 
+/**
+ * Converts a number in string format to an array of Long number objects where each digit is its own Long object.
+ *
+ * @param Value The string representation of a number to Convert.
+ *
+ * @returns An array of Long numbers representing each digit in the string value.
+*/
 function StringToNumberArray(Value: string) : Long[]{
     var arr: Long[] = [];
     for (var i = 0; i < Value.length; i++) {
@@ -10,6 +25,16 @@ function StringToNumberArray(Value: string) : Long[]{
     return arr;
 }
 
+/** 
+ * Creates a hexidecimal string for a number with the specified length. 
+ * When the number is less than the number of gigits it will be padded with either 0's for +ve or F's for -ve numbers.
+ * If the number is longer than the length specified it will be truncated to that length. 
+ *
+ * @param num The number to be converted to a hex String
+ * @param len The length (Number of characters) of the string to return. Numbers are expected to be 1, 2, or 4 in length but any +ve number will work.
+ *
+ * @returns A string representation of the number in Hex format. Padded to the len specified.
+*/
 function toPaddedHexString(num: number, len: number): string {
 
     if (num === null || len === null)
@@ -45,21 +70,35 @@ function toPaddedHexString(num: number, len: number): string {
     return (result + str).substr(0, len);
 }
 
+/** 
+ * Calculates a two's complement integer from the given input value's bits.
+ *
+ * @param input_value The value to apply two's compliment to.
+ * @param num_bits The number of bits that two's compliment should be Calculated
+ *
+ * @returns Returns the two's complimented number
+*/
 function twos_complement(input_value: number, num_bits: number): number
 {
-    //Calculates a two's complement integer from the given input value's bits'''
     var mask = Math.pow(2, (num_bits - 1));
     return -(input_value & mask) + (input_value & ~mask)
 }
 
-
+/**
+ * A Long class for representing a 64 bit two's-complement integer value derived from the Closure Library for stand-alone use and extended with unsigned support.
+ * Original source from: https://github.com/dcodeIO/long.js
+ * Used to perform bitwise operations on 64 bit numbers in a system that can only nativly handle 32 bit bitwise. 
+ */
 class Long {
-    /**
-     * https://github.com/dcodeIO/long.js
-     */
+    /** Used to check if an object is a Long object. TODO: Fix this to type cast instead. */
     private __isLong__: boolean = true;
+	
+	/** The upper 32 bits */
     private high: number
+	/** The lower 32 bits */
     private low: number
+	
+	/** Determines if this is an unsigned long or a signed long. (Has -ve values or treated like larger +ve values)	*/
     private unsigned: boolean
 
     /** Set to true if the result of a calcualtion (Like add) is larger than 64-bits. Used to set OF flag. */
@@ -67,24 +106,12 @@ class Long {
 
     ///Not actually... but we had to give it a type. Until typescript is and WebAssembly play nicy nice. 
     private static wasm: { [index: string]: Function; } = null;
-    //private static skipwasmChecked = true;
 
-    //private static checkWASM() {
-    //    Long.skipwasmChecked = false;
-    //    try {
-    //        Long.wasm = new WebAssembly.Instance(new WebAssembly.Module(new Uint8Array([
-    //            0, 97, 115, 109, 1, 0, 0, 0, 1, 13, 2, 96, 0, 1, 127, 96, 4, 127, 127, 127, 127, 1, 127, 3, 7, 6, 0, 1, 1, 1, 1, 1, 6, 6, 1, 127, 1, 65, 0, 11, 7, 50, 6, 3, 109, 117, 108, 0, 1, 5, 100, 105, 118, 95, 115, 0, 2, 5, 100, 105, 118, 95, 117, 0, 3, 5, 114, 101, 109, 95, 115, 0, 4, 5, 114, 101, 109, 95, 117, 0, 5, 8, 103, 101, 116, 95, 104, 105, 103, 104, 0, 0, 10, 191, 1, 6, 4, 0, 35, 0, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 126, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 127, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 128, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 129, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11, 36, 1, 1, 126, 32, 0, 173, 32, 1, 173, 66, 32, 134, 132, 32, 2, 173, 32, 3, 173, 66, 32, 134, 132, 130, 34, 4, 66, 32, 135, 167, 36, 0, 32, 4, 167, 11
-    //        ])), {}).exports;
-    //    } catch (e) {
-    //        // no wasm support :(
-    //    }
-    //}
-
+	/**
+	 * Builds a new Long object given two regular numbers. 
+	 
+	 */
     constructor(low: number, high: number = 0, unsigned: boolean = true) {
-        //if (Long.skipwasmChecked)
-        //    Long.checkWASM();
-
-
         /**
          * The low 32 bits as a signed value.
          * @type {number}
@@ -1369,21 +1396,6 @@ class Registers {
             case "DL":
                 this.D.L = value;
                 return true;
-            //case "BL":
-            //    this.BP.L = value;
-            //    break;
-            //case "SL":
-            //    this.SI.L = value;
-            //    break;
-            //case "DL":
-            //    this.DI.L = value;
-            //    break;
-            //case "SL":
-            //    this.SP.L = value;
-            //    break;
-            ////case "IL":
-            //    this.IP.L = value;
-            //    break;
             case "AH":
                 this.A.H = value;
                 return true;
@@ -1574,21 +1586,6 @@ class Registers {
                 return this.C.L;
             case "DL":
                 return this.D.L;
-            //case "BL":
-            //    this.BP.L = value;
-            //    break;
-            //case "SL":
-            //    this.SI.L = value;
-            //    break;
-            //case "DL":
-            //    this.DI.L = value;
-            //    break;
-            //case "SL":
-            //    this.SP.L = value;
-            //    break;
-            ////case "IL":
-            //    this.IP.L = value;
-            //    break;
             case "AH":
                 return this.A.H;
             case "BH":
@@ -1744,21 +1741,6 @@ class Registers {
                 return true;
             case "DL":
                 return true;
-            //case "BL":
-            //    this.BP.L = value;
-            //    break;
-            //case "SL":
-            //    this.SI.L = value;
-            //    break;
-            //case "DL":
-            //    this.DI.L = value;
-            //    break;
-            //case "SL":
-            //    this.SP.L = value;
-            //    break;
-            ////case "IL":
-            //    this.IP.L = value;
-            //    break;
             case "AH":
                 return true;
             case "BH":
@@ -1885,16 +1867,6 @@ class Registers {
             case "BL":
             case "CL":
             case "DL":
-            //case "BL":
-            //    break;
-            //case "SL":
-            //    break;
-            //case "DL":
-            //    break;
-            //case "SL":
-            //    break;
-            ////case "IL":
-            //    break;
             case "AH":
             case "BH":
             case "CH":
@@ -2062,31 +2034,6 @@ class Flags {
         i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
         return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
     }
-
-    //NumberOfSetBits(n: number): number {
-    //    var count: number = 0;
-    //    var temp: number = 0;
-    //    for (var i = 0; i < 64 ; i++) { // 64-bit for long data-type
-    //        temp = 1;
-    //        temp = temp << i;
-    //        temp = n & temp;
-    //        if ((temp > 0))
-    //            count++;
-    //    }
-    //    return count;
-    //}
-
-    //NumberOfSetBits(i: number): number {
-    //    https://stackoverflow.com/questions/34116205/count-number-of-set-bits-in-a-long-number
-    //    i = i - ((i >>> 1) & 0x5555555555555555);
-    //    i = (i & 0x3333333333333333) + ((i >>> 2) & 0x3333333333333333);
-    //    i = (i + (i >>> 4)) & 0x0f0f0f0f0f0f0f0f;
-    //    i = i + (i >>> 8);
-    //    i = i + (i >>> 16);
-    //    i = i + (i >>> 32);
-    //    return i & 0x7f;
-    //}
-
     IsByteCarried(i: Long): boolean {
         return ((i.getLowBits()) & 0x100) == 0x100 ? true : false;
     }
@@ -2095,13 +2042,11 @@ class Flags {
     }
     IsUIntCarried(i: Long): boolean {
         return (Math.abs(i.getHighBits()) >= 0x1) ? true : false;
-        //return ((i & 0x100000000) == 0x100000000) ? true : false;
     }
     IsULongCarried(i: Long): boolean {
         var o = i.overflow;
         i.overflow = false;
         return o;
-        //return ((i & 0x100000000000000000) == 0x100000000000000000) ? true : false;
     }
 
     IsZero(i: Long): boolean {
@@ -2109,27 +2054,21 @@ class Flags {
     }
 
     IsByteNegative(i: Long): boolean {
-        //return i < 0 ? true : false;
         return ((i.getLowBits() & 0x80) == 0x80) ? true : false;
     }
     IsUShortNegative(i: Long): boolean {
-        //return i < 0 ? true : false;
         return ((i.getLowBits() & 0x8000) == 0x8000) ? true : false;
     }
     IsUIntNegative(i: Long): boolean {
-        //return i < 0 ? true : false;
         return ((i.getLowBits() & 0x80000000) == 0x80000000) ? true : false;
     }
     IsULongNegative(i: Long): boolean {
-        //return i < 0 ? true : false;
         return ((i.getHighBits() & 0x80000000) == 0x80000000) ? true : false;
-        //return ((i & 0x8000000000000000) == 1) ? true : false;
     }
 
     /**
     https://en.wikibooks.org/wiki/X86_Assembly/Control_Flow#Jump_if_Lesser
     http://teaching.idallen.com/dat2343/10f/notes/040_overflow.txt
-    Good lord I don't know why I have to have the lessthan check in 64-bit mode when this worked fine in 32-bit mode!?
     */
     IsByteOverFlow(i: Long, a: Long, b: Long = Long.UZERO): boolean {
         if ((a.getLowBits() & 0x80) != (b.getLowBits() & 0x80))
@@ -2154,14 +2093,12 @@ class Flags {
         return (i.getLowBits() & 0x80000000) != (a.getLowBits() & 0x80000000);
     }
     IsULongOverFlow(i: Long, a: Long, b: Long = Long.UZERO): boolean {
-        //if ((a.getLowBits() & 0x80) != (b.getLowBits() & 0x80))
-        //    return false;
         if (a.lessThan(b))
             return false;
 
         var o = i.overflow;
         i.overflow = false;
-        return o; // > 0x100000000000000000;
+        return o;
     }
 
     SetAllFlagsForByte(val: Long, a: Long, b: Long = Long.UZERO) {
@@ -2234,160 +2171,7 @@ class Flags {
     public VIP: boolean = false;
     public ID: boolean = true;
 
-    /*
-
-    private boolToNumber(b: boolean): number {
-        if (b)
-            return 1;
-        return 0;
-    }
-    //0	0x0001	CF	Carry flag	Status	CY(Carry)	NC(No Carry)
-    public get CF(): boolean {
-        return (this._flags & 0x0001) == 1;
-    }
-    public set CF(value: boolean) {
-        var flagsVal = this._flags & 0xFFFFFFFFFFFFFFFE;
-        var cf = this.boolToNumber(value) & 1;
-        this._flags = flagsVal | cf;
-    }
-
-    //1	0x0002		Reserved, always 1 in EFLAGS[2][3]
-
-    //2	0x0004	PF	Parity flag	Status	PE(Parity Even)	PO(Parity Odd)
-    public get PF(): boolean {
-        return (this._flags & 0x0004) == 1;
-    }
-    public set PF(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFFFFFB) | (this.boolToNumber(value) << 2);
-    }
-    //3	0x0008		Reserved[3]
-
-    //4	0x0010	AF	Adjust flag	Status	AC(Auxiliary Carry)	NA(No Auxiliary Carry)
-    public get AF(): boolean {
-        return (this._flags & 0x0010) == 1;
-    }
-    public set AF(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFFFFEF) | (this.boolToNumber(value) << 4);
-    }
-
-    //5	0x0020		Reserved[3]
-
-    //6	0x0040	ZF	Zero flag	Status	ZR(Zero)	NZ(Not Zero)
-    public get ZF(): boolean {
-        return (this._flags & 0x0040) == 1;
-    }
-    public set ZF(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFFFFBF) | (this.boolToNumber(value) << 6);
-    }
-    //7	0x0080	SF	Sign flag	Status	NG(Negative)	PL(Positive)
-    public get SF(): boolean {
-        return (this._flags & 0x0080) == 1;
-    }
-    public set SF(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFFFF7F) | (this.boolToNumber(value) << 7);
-    }
-    //8	0x0100	TF	Trap flag(single step)	Control
-    public get TF(): boolean {
-        return (this._flags & 0x0100) == 1;
-    }
-    public set TF(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFFFEFF) | (this.boolToNumber(value) << 8);
-    }
-
-    //9	0x0200	IF	Interrupt enable flag	Control	EI(Enable Interrupt)	DI(Disable Interrupt)
-    public get IF(): boolean {
-        return (this._flags & 0x0200) == 1;
-    }
-    public set IF(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFFFDFF) | (this.boolToNumber(value) << 9);
-    }
-
-    //10	0x0400	DF	Direction flag	Control	DN(Down)	UP(Up)
-    public get DF(): boolean {
-        return (this._flags & 0x0400) == 1;
-    }
-    public set DF(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFFFBFF) | (this.boolToNumber(value) << 10);
-    }
-
-    //11	0x0800	OF	Overflow flag	Status	OV(Overflow)	NV(Not Overflow)
-    public get OF(): boolean {
-        return (this._flags & 0x0800) == 1;
-    }
-    public set OF(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFFF7FF) | (this.boolToNumber(value) << 11);
-    }
-
-    //12 - 13	0x3000	IOPL	I / O privilege level(286 + only), always 1[clarification needed]on 8086 and 186	System
-
-    //14	0x4000	NT	Nested task flag(286 + only), always 1 on 8086 and 186	System
-    public get NT(): boolean {
-        return (this._flags & 0x4000) == 1;
-    }
-    public set NT(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFFBFFF) | (this.boolToNumber(value) << 14);
-    }
-
-    //15	0x8000		Reserved, always 1 on 8086 and 186, always 0 on later models
-
-    //EFLAGS
-    //16	0x0001 0000	RF	Resume flag(386 + only)	System
-    public get RF(): boolean {
-        return (this._flags & 0x00010000) == 1;
-    }
-    public set RF(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFEFFFF) | (this.boolToNumber(value) << 16);
-    }
-
-    //17	0x0002 0000	VM	Virtual 8086 mode flag(386 + only)	System
-    public get VM(): boolean {
-        return (this._flags & 0x00020000) == 1;
-    }
-    public set VM(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFDFFFF) | (this.boolToNumber(value) << 17);
-    }
-
-    //18	0x0004 0000	AC	Alignment check(486SX + only)	System
-    public get AC(): boolean {
-        return (this._flags & 0x00040000) == 1;
-    }
-    public set AC(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFFBFFFF) | (this.boolToNumber(value) << 18);
-    }
-
-    //19	0x0008 0000	VIF	Virtual interrupt flag(Pentium +)	System
-    public get VIF(): boolean {
-        return (this._flags & 0x00080000) == 1;
-    }
-    public set VIF(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFF7FFFF) | (this.boolToNumber(value) << 19);
-    }
-
-    //20	0x00100000	VIP	Virtual interrupt pending(Pentium +)	System
-    public get VIP(): boolean {
-        return (this._flags & 0x00100000) == 1;
-    }
-    public set VIP(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFEFFFFF) | (this.boolToNumber(value) << 20);
-    }
-
-    //21	0x00200000	ID	Able to use CPUID instruction(Pentium +)	System
-    public get ID(): boolean {
-        return (this._flags & 0x00200000) == 1;
-    }
-    public set ID(value: boolean) {
-        this._flags = (this._flags & 0xFFFFFFFFFFDFFFFF) | (this.boolToNumber(value) << 21);
-    }
-
-    //22 - 31	0xFFC0 0000		Reserved	System
-    //RFLAGS
-    //32 - 63	0xFFFF FFFF 0000 0000		Reserved	 
-
-*/
-
     public ToString(withheaders: boolean = true): string {
-        //if (!withheaders) { return this._flags.toString(16); }
-
         var header = 'CF	PF	AF  ZF  SF	TF	IF	DF	OF	RF	VM	AC	VIF	VIP	ID\n';
         header += ' ' + this.CF + '\t ' + this.PF + '\t ' + this.AF + '\t ' + this.ZF + '\t ' + this.SF + '\t ' + this.TF +
             '\t ' + this.IF + '\t ' + this.DF + '\t ' + this.OF + '\t ' + this.RF + '\t ' + this.VM + '\t ' + this.AC +
@@ -2398,7 +2182,6 @@ class Flags {
 
     public SaveFlags(): Long {
         var low: number = 0;
-        //EFLAGS(SF: ZF: 0: AF: 0: PF: 1: CF)
         if (this.CF) low |= 0x0001;
         low |= 0x0002;
         if (this.PF) low |= 0x0004;
@@ -2413,7 +2196,7 @@ class Flags {
         if (this.OF) low |= 0x0800;
         low |= 0x3000;
         low |= 0x4000;
-        //if (this.CF) low |= 0x8000;
+
         //EFLAGS
         if (this.RF) low |= 0x00010000;
         if (this.VM) low |= 0x00020000;
@@ -2430,13 +2213,9 @@ class Flags {
         var low: number = f.getLowBits();
 
         if (size == 1) {
-            //EFLAGS(SF: ZF: 0: AF: 0: PF: 1: CF)
             this.CF = (low & 0x0001) == 0x0001;
-            //low |= 0x0002;
             this.PF = (low |= 0x0004) == 0x0004;
-            //low |= 0x0008;
             this.AF = (low |= 0x0010) == 0x0010;
-            //low |= 0x0020;
             this.ZF = (low |= 0x0040) == 0x0040;
             this.SF = (low |= 0x0080) == 0x0080;
             return;
@@ -2444,20 +2223,14 @@ class Flags {
 
         if (size >= 2) {
             this.CF = (low & 0x0001) == 0x0001;
-            //low |= 0x0002;
             this.PF = (low |= 0x0004) == 0x0004;
-            //low |= 0x0008;
             this.AF = (low |= 0x0010) == 0x0010;
-            //low |= 0x0020;
             this.ZF = (low |= 0x0040) == 0x0040;
             this.SF = (low |= 0x0080) == 0x0080;
             this.TF = (low |= 0x0100) == 0x0100;
             this.IF = (low |= 0x0200) == 0x0200;
             this.DF = (low |= 0x0400) == 0x0400;
             this.OF = (low |= 0x0800) == 0x0800;
-            //low |= 0x3000;
-            //low |= 0x4000;
-            //if (this.CF) low |= 0x8000;
         }
 
         //EFLAGS
@@ -2925,19 +2698,6 @@ class Operator {
         return false;
     }
 
-    //    public static Contains(strop: string ): boolean
-    //{
-    //        var op = Operator.GetOperationFromValue(strop);
-
-    //    foreach(Operator oper in Operators)
-    //    {
-    //        if (oper.Op == op)
-    //            return true;
-    //    }
-
-    //    return false;
-    //}
-
     public static Get(list: Operator[], strop: string): Operator {
         if (!list)
             list = Operator.Operators;
@@ -2953,29 +2713,12 @@ class Operator {
         return null;
     }
 
-    //    public static Get(strop: string): Operator
-    //{
-    //        var op = Operator.GetOperationFromValue(strop);
-
-    //    foreach(Operator oper in Operators)
-    //    {
-    //        if (oper.Op == op)
-    //            return oper;
-    //    }
-
-    //    return null;
-    //}
-
     public get Prescedence(): number {
         {
             switch (this.Op) {
                 case Operation.MemberSelection: return 3;
-                //case ")": return 0;
-                //case ";": return 0;
-                //case ",": return 0;
                 case Operation.Assignment: return 0;
                 case Operation.InnerAssignment: return 1;
-                //case "]": return 0;
                 case Operation.LogicalOR: return 1;
                 case Operation.LogicalAND: return 2;
                 case Operation.BitwiseOR: return 3;
@@ -3123,7 +2866,6 @@ class Token {
     public RightAssociative: boolean;
 
     public ToString(): string {
-        //return TokenType + " {" + TokenIndex + ", " + TokenLength + "} " + Value;
         return this.Value;
     }
 }
@@ -3143,7 +2885,7 @@ enum TokenTypes {
 /// <summary>
 /// https://www.regextester.com/94780
 /// </summary>
-const tokeniserRegex: string = "((([\\w/\\-\\$@#%])|(\\.(?!$)))+)|([^\\s\\w/\\-\\$@#%.])|\\.$"; // @"((([\w/\-\$@#'%])|(\.(?!$)))+)|([^\s\w/\-\$@#'%.])|\.$";
+const tokeniserRegex: string = "((([\\w/\\-\\$@#%])|(\\.(?!$)))+)|([^\\s\\w/\\-\\$@#%.])|\\.$";
 const escapechar: string = '\\';
 
 const Punctuators: string[] = ["(", ")", "[", "]", ":", "{", "}", ","];
@@ -3241,13 +2983,9 @@ class Tokenizer {
         var d: number; //For testing if a number.
         var val;
 
-        //var matches: RegExpExecArray = ex.exec(scIPt);
-
         var m;
         while ((m = ex.exec(scIPt)) !== null)
-        //for (var matchidx = 0; matchidx < matches.length; matchidx++)
         {
-            //var m = matches[matchidx];
             var mValue: string = m[0];
             if (skipBeforeIndex > m.index)
                 continue;
@@ -3255,27 +2993,24 @@ class Tokenizer {
             var t: Token = new Token();
             t.Value = mValue;
             t.TokenIndex = m.index;
-            t.TokenLength = mValue.length; // m.lastIndex - m.index;
+            t.TokenLength = mValue.length;
             t.TokenType = TokenTypes.Name;
 
-            if (!instring && (mValue.indexOf(CommentChar) == 0)) // || (mValue == "/" && m.NextMatch() != null && m.NextMatch().Value == "*"))) //Check for comments.
+            if (!instring && (mValue.indexOf(CommentChar) == 0))
             {
                 stringliteralStart = m.index;
                 stringopening = mValue;
                 lastcharisescape = false;
                 tokentype = t.TokenType = TokenTypes.Comment;
 
-                //int startindex;
                 var endindex: number;
 
                 if (mValue.indexOf(CommentChar) == 0) //Special case as the closing \n token is excluded by regex....
                 {
-                    //startindex = t.TokenIndex;
                     endindex = scIPt.indexOf('\n', t.TokenIndex);
                 }
-                else //if (m.Value == "/*")
+                else
                 {
-                    //startindex = t.TokenIndex;
                     endindex = scIPt.indexOf("*/", t.TokenIndex) + 3;
                 }
 
@@ -3293,7 +3028,6 @@ class Tokenizer {
                     t.Value = scIPt.substring(t.TokenIndex, t.TokenIndex + t.TokenLength);
                     skipBeforeIndex = endindex;
                 }
-                //stringopening = "\n";
             }
             else if (!instring && (mValue == "\"" || mValue == "'")) //Check for String literal opening.
             {
@@ -3367,82 +3101,13 @@ class Tokenizer {
                 t.Value = (val) + "";
                 t.TokenType = TokenTypes.Number;
             }
-            //else if ((t.Value.indexOf("0x") == 0 ||
-            //    t.Value.indexOf("-0x") == 0) ) //Number literal. Base 16 (Hex)
-            //{
-            //    t.TokenType = TokenType.Number;
-            //    var isNeg: boolean = t.Value.indexOf("-") >= 0;
-
-            //    //Number('x') || 0
-            //    Number('x') || 0;
-
-            //    var val: number = Convert.ToInt32(t.Value.Replace("-", "").Replace("0x", ""), 16);
-
-            //    if (isNeg)
-            //        t.Value = (val * -1) + "";
-            //    else
-            //        t.Value = (val) + "";
-
-            //}
-            //else if ((t.Value.indexOf("0b") == 0 ||
-            //    t.Value.indexOf("-0b") == 0)) //Number literal. Base 2 (Binary)
-            //{
-            //    t.TokenType = TokenType.Number;
-            //    var isNeg: boolean = t.Value.indexOf("-") >= 0;
-
-            //    var val: number = Convert.ToInt32(t.Value.Replace("-", "").Replace("0b", ""), 2);
-
-            //    if (isNeg)
-            //        t.Value = (val * -1) + "";
-            //    else
-            //        t.Value = (val) + "";
-
-            //}
-            //else if (t.Value.indexOf(".") == -1 && (t.Value.indexOf("0") == 0 || t.Value.indexOf("-0") == 0 ||
-            //    t.Value.indexOf("0o") == 0 || t.Value.indexOf("-0o") == 0))
-            ////Number Literal Base 8 (Octal)
-            //{
-            //    t.TokenType = TokenType.Number;
-
-            //    var isNeg: boolean = t.Value.indexOf("-") >= 0;
-
-            //    var val: number = Convert.ToInt32(t.Value.Replace("-", "").Replace("o", ""), 8);
-
-            //    if (isNeg)
-            //        t.Value = (val * -1) + "";
-            //    else
-            //        t.Value = (val) + "";
-            //}
-            //else if (t.Value.indexOf(".") >= 0 && (t.Value.indexOf("E+") >= 0 || t.Value.indexOf("E-") >= 0)) //Todo: Check for data type of number? (int, float, double)
-            //{
-            //    d = double.Parse(t.Value.Replace("E", "e"));
-            //    t.Value = d + "";
-            //    t.TokenType = TokenType.Number;
-            //}
-            //else if (double.TryParse(t.Value, out d)) //Todo: Check for data type of number? (int, float, double)
-            //{
-            //    t.Value = d + "";
-            //    t.TokenType = TokenType.Number;
-            //}
             else if (Operator.Contains(Operator.Operators, t.Value)) // Check is an operator
             {
                 t.TokenType = TokenTypes.Operator;
 
-                //var skipmatches: number = -1;
-
-                ////Because our RegEx doesn't account for multi char operators go through each following match and check to see if it's an operator as well and concat them together.
-                //var next = ex.exec(scIPt);
-                //while (next != null && Operator.Contains(Operator.Operators, next.toString())) {
-                //    t.Value += next[0];
-                //    skipmatches = next.index + 1;
-                //    next = ex.exec(scIPt);
-                //}
-
                 if (t.Value == "^" || t.Value.toUpperCase() == "LENGTH")
                     t.RightAssociative = true;
 
-                //if (skipmatches > 0)
-                //    skipBeforeIndex = skipmatches;
             }
             else if (t.Value.indexOf(".") >= 0) //Case for Regex doesn't seperate "." which is important for numbers. So for Objects and properties / functions we'll do it manually.
             {
@@ -3450,38 +3115,6 @@ class Tokenizer {
                 toReturn.push(t);
                 continue;
             }
-            //else if ((t.Value.indexOf("++") == 0 || t.Value.indexOf("--") == 0) && t.Value.length > 2) {
-            //    Token pre = new Token();
-            //    pre.RightAssociative = true;
-            //    pre.TokenIndex = t.TokenIndex;
-            //    pre.TokenLength = 2;
-            //    pre.TokenType = TokenType.Operator;
-            //    pre.Value = t.Value.indexOf("++") == 0 ? "++" : "--";
-
-            //    toReturn.Add(pre);
-            //    t.Value = t.Value.Substring(2);
-            //    t.TokenIndex += 2;
-            //    t.TokenLength = t.Value.Length;
-            //    toReturn.Add(t);
-            //    continue;
-            //}
-            //else if (t.Value.indexOf("++") == 0 || t.Value.indexOf("--") == 0 && t.Value.length > 2) {
-            //    Token post = new Token();
-            //    post.RightAssociative = false;
-            //    post.TokenIndex = t.TokenIndex;
-            //    post.TokenLength = 2;
-            //    post.TokenType = TokenType.Operator;
-            //    post.Value = t.Value.EndsWith("++") ? "++" : "--";
-
-            //    t.Value = t.Value.Substring(0, t.Value.Length - 2);
-            //    t.TokenIndex += 2;
-            //    t.TokenLength = t.Value.Length;
-            //    toReturn.Add(t);
-
-            //    toReturn.Add(post);
-            //    continue;
-            //}
-            // if (t.TokenType != TokenType.Comment)
             if (addComments || t.TokenType != TokenTypes.Comment)
                 toReturn.push(t);
         }
@@ -3514,6 +3147,7 @@ class Variable {
 
     //The Size of memory allocated in bytes
     public Size: number;
+	
     //Segments are ignored in 64-bit.
     //public Segment: number;
 }
@@ -3645,7 +3279,7 @@ class RAM {
      * All variables when initilized are written to memory and the address of the var is saved here for lookups by labels in instructions.
      */
     public Variables: Variable[] = [];
-    private nextFreeAddress: Long = new Long(0x10); //Reserve first 16 addresses mostly to tell that the first var isn't just 0 for debugging.
+    private nextFreeAddress: Long = new Long(0x10); //Reserve first 16 addresses mostly to tell that the first var isn't 0 (NULL) for debugging.
 
     constructor() {
         this.memory = new Uint8Array(0xA00000);
@@ -3691,7 +3325,7 @@ class RAM {
         var address = this.nextFreeAddress.copy();
         var startAddress = address;
 
-        if (index > -1) { //Var already exists. Overwrite it. Don't worry about overruns in ASM programmer has to worry. 
+        if (index > -1) { //Var already exists. Overwrite it. Don't worry about overruns in ASM. Programmer has to worry. 
             this.WriteMemory(existing.Address, value, bytestowrite);
             return existing;
         }
@@ -3773,19 +3407,15 @@ class RAM {
     public ReadMemory1Byte(offset: Long | number): Long {
         if (offset instanceof Long)
             offset = offset.getLowBits();
-        //CheckMemAccess(segment, offset, 0, false);
-        //if (segments[segment] != null)
 
         this.readcallback(offset, this.memory[offset]);
 
         return new Long(this.memory[offset]);
-        //return 0;
     }
     public ReadMemory2Bytes(offset: Long | number): Long {
         if (offset instanceof Long)
             offset = offset.getLowBits();
 
-        //CheckMemAccess(segment, offset, 0, false);
         var val = ((this.memory[offset + 1]) << 8);
         val += (this.memory[offset]);
 
@@ -3797,7 +3427,7 @@ class RAM {
     public ReadMemory4Bytes(offset: Long | number): Long {
         if (offset instanceof Long)
             offset = offset.getLowBits();
-        //CheckMemAccess(segment, offset, 0, false);
+
         var val = ((this.memory[offset + 3]) << 24);
         val += (this.memory[offset + 2] << 16);
         val += (this.memory[offset + 1] << 8);
@@ -3814,7 +3444,6 @@ class RAM {
         if (offset instanceof Long)
             offset = offset.getLowBits();
 
-        //CheckMemAccess(segment, offset, 0, false);
         var val: number[] = [
             this.memory[offset + 7] & 0xFF,
             this.memory[offset + 6] & 0xFF,
@@ -3844,7 +3473,6 @@ class RAM {
         if (offset instanceof Long)
             offset = offset.getLowBits();
 
-        //CheckMemAccess(segment, offset, 0, false);
         var valh: number[] = [
             this.memory[offset + 15] & 0xFF,
             this.memory[offset + 14] & 0xFF,
@@ -3961,7 +3589,6 @@ class RAM {
         if (Value instanceof Long)
             Value = Value.getLowBits();
 
-        //CheckMemAccess(segment, offset, (uint)Value, true);
         if (this.undoList != null && !isUndo)
             this.undoList.AddMemoryChange(new Long(offset), new Long(this.memory[offset]));
         this.memory[offset] = Value;
@@ -3971,7 +3598,6 @@ class RAM {
     public WriteMemoryByteArray(offset: Long | number, Values: Long[] | number[], isUndo: boolean = false) {
         if (offset instanceof Long)
             offset = offset.getLowBits();
-        //CheckMemAccess(segment, offset, (uint)Values[0], true);
         for (var i = 0; i < Values.length; i++) {
             var val = Values[i];
             if (val instanceof Long)
@@ -3991,7 +3617,6 @@ class RAM {
         if (Value instanceof Long)
             Value = Value.getLowBits();
 
-        //CheckMemAccess(segment, offset, (uint)Value, true);
         if (this.undoList != null && !isUndo) {
             this.undoList.AddMemoryChange(new Long(offset + 1), new Long(this.memory[offset + 1]));
             this.undoList.AddMemoryChange(new Long(offset), new Long(this.memory[offset]));
@@ -4010,7 +3635,6 @@ class RAM {
         if (Value instanceof Long)
             Value = Value.getLowBits();
 
-        //CheckMemAccess(segment, offset, Value, true);
         if (this.undoList != null && !isUndo) {
             this.undoList.AddMemoryChange(new Long(offset + 3), new Long( this.memory[offset + 3]));
             this.undoList.AddMemoryChange(new Long(offset + 2), new Long(this.memory[offset + 2]));
@@ -4048,7 +3672,6 @@ class RAM {
             valArr[offset + 1] = (Value >> 8) & 0xFF;
             valArr[offset] = (Value & 0xFF) & 0xFF;
         }
-        //CheckMemAccess(segment, offset, Value, true);
         if (this.undoList != null && !isUndo) {
             this.undoList.AddMemoryChange(new Long(offset + 3), new Long(this.memory[offset + 3]));
             this.undoList.AddMemoryChange(new Long(offset + 2), new Long(this.memory[offset + 2]));
@@ -4057,23 +3680,23 @@ class RAM {
         }
 
 
-        this.memory[offset + 7] = valArr[7]; // (Value >> 56);
-        this.memory[offset + 6] = valArr[6]; //(Value >> 48);
-        this.memory[offset + 5] = valArr[5]; //(Value >> 40);
-        this.memory[offset + 4] = valArr[4]; //(Value >> 32);
-        this.memory[offset + 3] = valArr[3]; //(Value >> 24);
-        this.memory[offset + 2] = valArr[2]; //(Value >> 16);
-        this.memory[offset + 1] = valArr[1]; //(Value >> 8);
-        this.memory[offset] = valArr[0]; //(Value & 0xFF);
+        this.memory[offset + 7] = valArr[7]; 
+        this.memory[offset + 6] = valArr[6]; 
+        this.memory[offset + 5] = valArr[5]; 
+        this.memory[offset + 4] = valArr[4]; 
+        this.memory[offset + 3] = valArr[3]; 
+        this.memory[offset + 2] = valArr[2]; 
+        this.memory[offset + 1] = valArr[1]; 
+        this.memory[offset] = valArr[0]; 
 
-        this.writecallback(offset + 7, valArr[7]); //Value >> 56);
-        this.writecallback(offset + 6, valArr[6]); //Value >> 48);
-        this.writecallback(offset + 5, valArr[5]); //Value >> 40);
-        this.writecallback(offset + 4, valArr[4]); //Value >> 32);
-        this.writecallback(offset + 3, valArr[3]); //Value >> 24);
-        this.writecallback(offset + 2, valArr[2]); //Value >> 16);
-        this.writecallback(offset + 1, valArr[1]); //Value >> 8);
-        this.writecallback(offset, valArr[0]); //Value & 0xFF);
+        this.writecallback(offset + 7, valArr[7]); 
+        this.writecallback(offset + 6, valArr[6]); 
+        this.writecallback(offset + 5, valArr[5]); 
+        this.writecallback(offset + 4, valArr[4]); 
+        this.writecallback(offset + 3, valArr[3]); 
+        this.writecallback(offset + 2, valArr[2]); 
+        this.writecallback(offset + 1, valArr[1]); 
+        this.writecallback(offset, valArr[0]); 
     }
 
     public WriteMemory16Bytes(offset: Long | number, ValueH: Long, ValueL: Long, isUndo: boolean = false) {
@@ -4084,7 +3707,6 @@ class RAM {
 
            valArr = ValueH.toBytes(true).concat(ValueL.toBytes(true));
         
-        //CheckMemAccess(segment, offset, Value, true);
         if (this.undoList != null && !isUndo) {
             this.undoList.AddMemoryChange(new Long(offset + 3), new Long(this.memory[offset + 3]));
             this.undoList.AddMemoryChange(new Long(offset + 2), new Long(this.memory[offset + 2]));
@@ -4093,23 +3715,23 @@ class RAM {
         }
 
 
-        this.memory[offset + 7] = valArr[7]; // (Value >> 56);
-        this.memory[offset + 6] = valArr[6]; //(Value >> 48);
-        this.memory[offset + 5] = valArr[5]; //(Value >> 40);
-        this.memory[offset + 4] = valArr[4]; //(Value >> 32);
-        this.memory[offset + 3] = valArr[3]; //(Value >> 24);
-        this.memory[offset + 2] = valArr[2]; //(Value >> 16);
-        this.memory[offset + 1] = valArr[1]; //(Value >> 8);
-        this.memory[offset] = valArr[0]; //(Value & 0xFF);
+        this.memory[offset + 7] = valArr[7]; 
+        this.memory[offset + 6] = valArr[6]; 
+        this.memory[offset + 5] = valArr[5]; 
+        this.memory[offset + 4] = valArr[4]; 
+        this.memory[offset + 3] = valArr[3]; 
+        this.memory[offset + 2] = valArr[2]; 
+        this.memory[offset + 1] = valArr[1];
+        this.memory[offset] = valArr[0];
 
-        this.writecallback(offset + 7, valArr[7]); //Value >> 56);
-        this.writecallback(offset + 6, valArr[6]); //Value >> 48);
-        this.writecallback(offset + 5, valArr[5]); //Value >> 40);
-        this.writecallback(offset + 4, valArr[4]); //Value >> 32);
-        this.writecallback(offset + 3, valArr[3]); //Value >> 24);
-        this.writecallback(offset + 2, valArr[2]); //Value >> 16);
-        this.writecallback(offset + 1, valArr[1]); //Value >> 8);
-        this.writecallback(offset, valArr[0]); //Value & 0xFF);
+        this.writecallback(offset + 7, valArr[7]); 
+        this.writecallback(offset + 6, valArr[6]); 
+        this.writecallback(offset + 5, valArr[5]); 
+        this.writecallback(offset + 4, valArr[4]); 
+        this.writecallback(offset + 3, valArr[3]); 
+        this.writecallback(offset + 2, valArr[2]); 
+        this.writecallback(offset + 1, valArr[1]); 
+        this.writecallback(offset, valArr[0]);
     }
     
 }
@@ -4152,6 +3774,7 @@ class Program {
      * The Actual Code. As its been interpreted. 
      */
     public Instructions: Statement[] = [];
+	
     ///Stores references to Labels and Function declaration addresses (Index of Instruction).
     public Labels: Variable[] = [];
     
@@ -4166,7 +3789,6 @@ class Program {
 
         this.stript = scIPt;
         this.InitinterruptTable();
-        //this.Initilize(scIPt);
     }
     
     public GetLabel(labelname: string): Variable {
@@ -4184,10 +3806,6 @@ class Program {
 
         if (this.IsWaiting)
             return true;
-        //if (this.WaitResult != null) {
-        //    this.WaitResult(this);
-        //    this.WaitResult = null;
-        //}
 
         var ip = this.Regs.IP.E;
         if (this.Instructions[ip.getLowBits()]) {
@@ -4258,7 +3876,6 @@ class Program {
             else if (input[this.index].TokenType == TokenTypes.Mnemonic) {
                 this.failedToken = input[this.index];
                 throw new Error("Unexpected Instruction near: " + this.failedToken.Value + "\nLine: " + this.GetErrorLine());
-                //bs.Statements.push(this.BuildMnemonic(input));
             }
             else if (input[this.index].TokenType == TokenTypes.Keyword) {
                 var result = this.BuildKeyword(input);
@@ -4270,26 +3887,8 @@ class Program {
                 bs.Statements.push(this.BuildLabel(input));
             else if (input[this.index].TokenType == TokenTypes.Name)
                 bs.Statements.push(this.BuildIdentifier(input));
-            //else if (input[this.index].TokenType == TokenType.Number)
-            //    bs.Statements.push(this.BuildNumber(input));
-            //else if (input[this.index].TokenType == TokenType.String)
-            //    bs.Statements.push(this.BuildString(input));
-            //else if (input[this.index].TokenType == TokenType.Operator)
-            //    bs.Statements.push(this.BuildOperator(input));
-            //else if (input[this.index].TokenType == TokenType.Punctuator)
-            //    bs.Statements.push(this.BuildPunctuator(input));
-
             else
-                //switch (c.Value) {
-                //    case "(":
-                //        operatorStack.push(c);
-                //        break;
-                //    case ")":
-                //}
-
                 this.index++;
-
-
         }
 
         this.failedToken = null;
@@ -4326,14 +3925,12 @@ class Program {
 
             if (lastToken.TokenType == TokenTypes.Number && (c.TokenType == TokenTypes.Label || c.TokenType == TokenTypes.Name))
                 break;
-            //if (lastToken.TokenType == TokenTypes.Number && (c.TokenType == TokenTypes.Label || c.TokenType == TokenTypes.Name))
-            //    break;
 
             switch (c.TokenType) {
                 case TokenTypes.Comment:
                     this.index++;
                     continue;
-                //case TokenTypes.Mnemonic: //Next statement
+					
                 case TokenTypes.Keyword: //Shouldn't hit this.
                     keepGoing = false;
                     break;
@@ -4364,12 +3961,12 @@ class Program {
                                 while (operatorStack.length > 0 && null != (o2 =
                                     Operator.Get(Operator.Operators, operatorStack[operatorStack.length - 1].Value))) {
                                     if ((o1.AssociativeDirection != AssociativeDirections.Right &&
-  0 == o1.ComparePrecedence(o2)) ||
-  o1.ComparePrecedence(o2) < 0) {
-  this.addNode(operandStack, operatorStack.pop(), this);
+										0 == o1.ComparePrecedence(o2)) ||
+										o1.ComparePrecedence(o2) < 0) {
+										this.addNode(operandStack, operatorStack.pop(), this);
                                     }
                                     else {
-  break;
+										break;
                                     }
                                 }
                                 operatorStack.push(c);
@@ -4450,12 +4047,6 @@ class Program {
         return "";
     }
 
-    //private BuildMnemonic(tokens: Token[]): Statement {
-    //    var mnemonic = tokens[this.index++].Value.toUpperCase();
-
-    //    var result: Statement = this.mnemonicBuilders[mnemonic](this, tokens);
-    //    return result;
-    //}
     private BuildKeyword(tokens: Token[]): Statement {
         var currentToken = tokens[this.index];
         var val = currentToken.Value.toLowerCase();
@@ -4543,7 +4134,6 @@ class Program {
             }
 
             var values: Long[] = this.GetInitialValue(this.Tokens, size);
-           // this.index++;
 
             this.Mem.SetVariable(name, values, size);
         }
@@ -4622,7 +4212,6 @@ class Program {
         this.index++; //Skip '(' value... Could have a sanity check here
 
         var values = this.GetInitialValue(tokens, size);
-        //this.index++; //Skip ')' value... Could have a sanity check here
 
         var toreturn: Long[] = [];
 
@@ -4631,23 +4220,19 @@ class Program {
             dupCount = dupCount.decrement();
         } while (!dupCount.equals(Long.UZERO))
         
-        //for (var i = 0; i < dupCount.getLowBits(); i++) {
-        //    toreturn = toreturn.concat(toreturn, values);
-        //}
-
         return toreturn;
     }
 
     private ProcessCodeBlock(tokens: Token[]): Statement[] {
         /*
-         start:
-	mov	ah, 09h   ; Display the message
-	lea	dx, msg
-	int	21h
-	mov	ax, 4C00h  ; Terminate the executable
-	int	21h
+			start:
+			mov	ah, 09h   ; Display the message
+			lea	dx, msg
+			int	21h
+			mov	ax, 4C00h  ; Terminate the executable
+			int	21h
 
-end start
+			end start
          */
         var toReturn:Statement[] = [];
 
@@ -5007,10 +4592,10 @@ end start
         "MessageBoxA": function (prog: Program) {
             var msg = "";
 
-            var uTypeAddr = prog.Regs.R9.R; //POP.Pop(prog, 4);
-            var lpCaptionaddr = prog.Regs.R8.R; //POP.Pop(prog, 4);
-            var lpTextaddr = prog.Regs.D.R; //POP.Pop(prog, 4);
-            var hWndAddr = prog.Regs.C.R; // POP.Pop(prog, 4);
+            var uTypeAddr = prog.Regs.R9.R;
+            var lpCaptionaddr = prog.Regs.R8.R;
+            var lpTextaddr = prog.Regs.D.R;
+            var hWndAddr = prog.Regs.C.R;
 
             var lpText;
             var lpCaption;
@@ -5088,9 +4673,6 @@ class StatementParameter {
     public Evaluate(): EvaluatedResult {
         var target: EvaluatedResult = this.Parameter.Evaluate();
 
-        //if (this.TargetSize != 0)
-        //    target.DataSize = this.TargetSize;
-
         //Adjust Size for variables. 
         if (this.Program.Mem.GetVariable(target.Name) != null) {
             if (this.TargetSize != 0) {
@@ -5099,17 +4681,12 @@ class StatementParameter {
 
         }
 
-        //if (!this.TargetIsPointer && target.DataSize > 0 && !(this.Parameter instanceof NumberValue)) {
-        //        target.Value = this.Program.Mem.ReadMemoryNumber(target.Value, target.DataSize);
-        //}
         return target;
     }
 }
 
 abstract class Statement {
-    //public StatementPreEvaluate: Function = function () { };
-    //public StatementPostEvaluated: Function = function (obj: Statement, result: EvaluatedResult) { };
-
+    
     public Program: Program;
 
     public Token: Token;
@@ -5141,91 +4718,6 @@ abstract class Statement {
     /// <param name="thisInstance">Used to define the object this statement is referencing. (Like a function call on an object.)</param>
     /// <returns></returns>
     public abstract Evaluate(): EvaluatedResult
-
-    /// <summary>
-    /// teps into this statement and outputs a child node into nextNode to be evaluated before this node can be evaluated or 
-    /// returns the evaluated result of this Statement.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="thisInstance"></param>
-    /// <param name="nextNode"></param>
-    /// <param name="dir"></param>
-    /// <returns></returns>
-    //public abstract object StepIn(out DataType type, object thisInstance, int dir, out Statement nextNode);
-
-
-    //public abstract Walk(): TreeNode
-
-    //public GetPrefixes(useTarget: boolean, tokens: Token[], env: Program): void {
-    //    var isreg = true;
-    //    var size = 0;
-    //    var breakbreakbreak = false;
-
-    //    while (tokens[env.index].Value != "," && tokens[env.index].TokenType != TokenTypes.Mnemonic) {
-    //        switch (tokens[env.index].Value.toUpperCase()) {
-    //            case "PBYTE":
-    //                isreg = false;
-    //            case "BYTE":
-    //                size = 1;
-    //                break;
-    //            case "PWORD":
-    //                isreg = false;
-    //            case "WORD":
-    //                size = 2;
-    //                break;
-    //            case "PDWORD":
-    //                isreg = false;
-    //            case "DWORD":
-    //                size = 4;
-    //                break;
-    //            case "PTR":
-    //            //case "[":
-    //            //case "]":
-    //                isreg = false;
-    //                break;
-    //            default:
-    //                breakbreakbreak = true;
-    //                break;
-    //        }
-    //        if (breakbreakbreak)
-    //            break;
-
-    //        env.index++;
-    //    }
-
-    //    if (useTarget) {
-    //        this.TargetIsRegister = isreg;
-    //        this.TargetSize = size;
-    //    }
-    //    else {
-    //        this.SourceIsRegister = isreg;
-    //        this.SourceSize = size;
-    //    }
-
-    //}
-
-    //public Get1ParameterStatements(tokens: Token[], env: Program) {
-
-    //    this.GetPrefixes(true, tokens, env);
-    //    this.Left = env.BuildAST(tokens);
-    //    if (tokens[env.index].Value == ",") //Technically this should not happen
-    //        throw new Error("Error paSIng 1 parameter instruction! Ran into an unexpected ','!");
-    //}
-
-    //public Get2ParameterStatements(tokens: Token[], env: Program) {
-    //    this.GetPrefixes(true, tokens, env);
-    //    if (tokens[env.index].Value == ",") //this should not happen
-    //        throw new Error("Error paSIng 2 parameter instruction! Ran into a ',' before its time!");
-    //    this.Left = env.BuildAST(tokens);
-    //    if (tokens[env.index].Value == ",")
-    //        env.index++;
-
-    //    if (tokens[env.index].TokenType == TokenTypes.Mnemonic)
-    //        return; //There's only one parameter.
-
-    //    this.GetPrefixes(false, tokens, env);
-    //    this.Right = env.BuildAST(tokens);
-    //}
 
     public GetParameterStatements(tokens: Token[], env: Program) {
 
@@ -5285,9 +4777,6 @@ abstract class Statement {
             param.TargetIsPointer = isptr;
             param.Parameter = env.BuildAST(tokens);
 
-            //if (env.Mem.GetVariable(param.Parameter.FriendlyName) != null)
-            //    param.TargetIsRegister = false;
-
             if (size > 0)
                 param.TargetSize = size;
             else if (!param.TargetIsPointer)
@@ -5306,9 +4795,7 @@ abstract class Statement {
 
     ///TODO: Target is an actual address...
     public AssignValueToTarget(value: Long, size: number, targetparam: StatementParameter = this.parameters[0]) {
-        //var targetparam: StatementParameter = this.parameters[0];
-        //var targetStmt = useRight ? this.Right : this.Left;
-            var actualSize = size; // targetparam.TargetSize < size ? targetparam.TargetSize : size;
+        var actualSize = size; // targetparam.TargetSize < size ? targetparam.TargetSize : size;
 
         if (targetparam.Parameter instanceof IdentifierStatement) {
             var isPtr = targetparam.TargetIsPointer;
@@ -5326,17 +4813,14 @@ abstract class Statement {
             var variable: Variable = this.Program.Mem.GetVariable(target.Name);
 
             if (variable != null) {
-                //actualSize = actualSize < variable.Size ? actualSize : variable.Size;
                 this.Program.Mem.WriteMemory(variable.Address, value, actualSize);
                 return true;
             }
         }
         if (targetparam.Parameter instanceof NumberValue) {
-            //var actualSize = targetparam.TargetSize < size ? targetparam.TargetSize : size;
             this.Program.Mem.WriteMemory(targetparam.Evaluate().Value, value, actualSize);
         }
         if (targetparam.Parameter instanceof OperationExpression) {
-            //var actualSize = targetparam.TargetSize < size ? targetparam.TargetSize : size;
             this.Program.Mem.WriteMemory(targetparam.Evaluate().Value, value, actualSize);
         }
         return false;
@@ -5460,9 +4944,6 @@ class BlockStatement extends Statement {
             if (this.Program.EndFunction) {
                 break;
             }
-
-            //if (Env.InterruptLoop)
-            //    break;
         }
 
 
@@ -5493,12 +4974,9 @@ class OperationExpression extends Statement
     }
 
     public Evaluate(): EvaluatedResult {
-
         //this.Program.preInstructionCallback(this);
 
         var result = new EvaluatedResult();
-        //result.DataSize = 0;
-        //result.Value = 0;
 
         var left: EvaluatedResult = this.parameters[0].Evaluate();
         var right: EvaluatedResult;
@@ -5560,7 +5038,6 @@ class OperationExpression extends Statement
                 result.Value = right.Value.shiftRight(left.Value.getLowBits());
                 break;
             case Operation.Length:
-                //result.Value = left.DataSize;
                 var v = this.Program.Mem.GetVariable(left.Name);
                 if (v != null)
                     result.Value = new Long(v.Size);
@@ -5576,7 +5053,6 @@ class OperationExpression extends Statement
 class NumberValue extends Statement
 {
         public Value: Long;
-        //public DataType Type = DataType.Number;
 
     constructor(preInstructionCallback: Function, postInstructionCallback: Function, t: Token, env: Program = null)
     {
@@ -5597,7 +5073,6 @@ class NumberValue extends Statement
 class StringValue extends Statement
 {
     public Value: string;
-    //public DataType Type = DataType.Number;
 
     constructor(preInstructionCallback: Function, postInstructionCallback: Function, t: Token, env: Program = null) {
         super(preInstructionCallback, postInstructionCallback, t, env);
@@ -5780,21 +5255,6 @@ class IdentifierStatement extends Statement
                     result.DataSize = 1;
                     result.Value = this.Program.Regs.D.L;
                     break;
-                //case "BL":
-                //    this.Program.Regs.BP.L;
-                //    break;
-                //case "SL":
-                //    this.Program.Regs.SI.L;
-                //    break;
-                //case "DL":
-                //    this.Program.Regs.DI.L;
-                //    break;
-                //case "SL":
-                //    this.Program.Regs.SP.L;
-                //    break;
-                ////case "IL":
-                //    this.Program.Regs.IP.L;
-                //    break;
                 case "AH":
                     result.DataSize = 1;
                     result.Value = this.Program.Regs.A.H;
@@ -5946,8 +5406,6 @@ class IdentifierStatement extends Statement
 
             }
         }
-        //object result = Name;
-
         //this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -5966,7 +5424,6 @@ class IgnoredInstruction extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult(this.FriendlyName);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
 
         console.log("Warning Unused Instruction Executed! " + this.Token.Value);
 
@@ -5987,7 +5444,6 @@ class NOP extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult();
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -6004,7 +5460,6 @@ class HLT extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult();
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -6015,13 +5470,11 @@ class END extends Statement {
 
     constructor(preInstructionCallback: Function, postInstructionCallback: Function, t: Token[], env: Program = null) {
         super(preInstructionCallback, postInstructionCallback, t[env.index-1], env);
-        //env.index++;
     }
 
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult();
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
 
         this.Program.End = true;
 
@@ -6043,7 +5496,6 @@ class MOV extends Statement {
 
         this.GetParameterStatements(tokens, env);
 
-        //env.index++;
     }
 
     public Evaluate(): EvaluatedResult {
@@ -6055,14 +5507,13 @@ class MOV extends Statement {
         var tsize = Statement.Size(target.DataSize, this.parameters[0], source.DataSize, this.parameters[1]);
         var ssize = Statement.Size(source.DataSize, this.parameters[1], target.DataSize, this.parameters[0]);
 
-        if (this.parameters[1].TargetIsPointer && ssize > 0) { // && !(this.parameters[1].Parameter instanceof NumberValue)) {
+        if (this.parameters[1].TargetIsPointer && ssize > 0) { 
             source.Value = this.Program.Mem.ReadMemoryNumber(source.Value, ssize);
         }
 
         if (this.MeetsCondition()) {
             if (this.AssignValueToTarget(source.Value, tsize)) {
             }
-            //this.Program.Regs.RFlags.SetFlags(target.DataSize, source.Value);
         }
         this.Program.postInstructionCallback(this, source);
         return source;
@@ -6242,7 +5693,6 @@ class CALL extends Statement {
             }
         }
         var result =  new EvaluatedResult(left.Name, this.Program.Regs.A.E);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -6259,10 +5709,6 @@ class RET extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
 
-        //Check if target is an external ref or a label... then either call and return or jump to.
-        //if (!this.parameters[0].TargetIsRegister)
-        //    left.Value = this.Program.Mem.ReadMemoryNumber(left.Value, left.DataSize);
-        
         //TODO: Local Call Update stack and IP.
         var value = POP.Pop(this.Program, 4);
         this.Program.Regs.IP.E = value.add(new Long(4));
@@ -6277,7 +5723,6 @@ class RET extends Statement {
         }
 
         var result = new EvaluatedResult("RET", this.Program.Regs.IP.E);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -6296,15 +5741,7 @@ class LEA extends Statement {
         var target: EvaluatedResult = this.parameters[0].Evaluate();
         var source: EvaluatedResult = this.parameters[1].Evaluate();
 
-        //var tsize = Statement.Size(target.DataSize, this.parameters[0], source.DataSize, this.parameters[1]);
-        //var ssize = Statement.Size(source.DataSize, this.parameters[1], target.DataSize, this.parameters[0]);
-        //if (!this.parameters[1].TargetIsRegister)
-        //    source.Value = this.Program.Mem.ReadMemoryNumber(source.Value, ssize);
-
-
-        if (this.AssignValueToTarget(source.Value, target.DataSize)) {
-        }
-        //this.Program.Regs.RFlags.SetFlags(source.DataSize, source.Value);
+        if (this.AssignValueToTarget(source.Value, target.DataSize)) {        }
         this.Program.postInstructionCallback(this, source);
         return source;
     }
@@ -6316,7 +5753,6 @@ class PUSH extends Statement {
         super(preInstructionCallback, postInstructionCallback, tokens[env.index], env);
         
         this.GetParameterStatements(tokens, env);
-        //env.index++;
     }
 
     public Evaluate(): EvaluatedResult {
@@ -6338,7 +5774,6 @@ class PUSH extends Statement {
     public static Push(program: Program, size: number, val: Long) {
         program.Regs.SP.E = program.Regs.SP.E.subtract(new Long(size));
         program.Mem.WriteMemoryNumber(program.Regs.SP.E, val, size);
-        //program.Regs.RFlags.SetFlags(size, val);
     }
 }
 
@@ -6348,7 +5783,6 @@ class POP extends Statement {
         super(preInstructionCallback, postInstructionCallback, tokens[env.index], env);
 
         this.GetParameterStatements(tokens, env);
-        //env.index++;
     }
 
     public Evaluate(): EvaluatedResult {
@@ -6357,10 +5791,6 @@ class POP extends Statement {
         var target: EvaluatedResult = this.parameters[0].Evaluate();
         target.DataSize = this.parameters[0].TargetSize;
         
-        //if (!this.parameters[1].TargetIsRegister)
-        //    target.Value = this.Program.Mem.ReadMemoryNumber(target.Value, target.DataSize);
-
-
         var val = POP.Pop(this.Program, target.DataSize);
         target.Value = val;
 
@@ -6375,7 +5805,6 @@ class POP extends Statement {
         var val = program.Mem.ReadMemoryNumber(program.Regs.SP.E, size);
         program.Regs.SP.E = program.Regs.SP.E.add(new Long(size));
 
-        //program.Regs.RFlags.SetFlags(size, val);
         return val;
     }
 }
@@ -6451,7 +5880,6 @@ class POPF extends Statement {
         var val = program.Mem.ReadMemoryNumber(program.Regs.SP.E, size);
         program.Regs.SP.E = program.Regs.SP.E.add(new Long(size));
 
-        //program.Regs.RFlags.SetFlags(size, val);
         return val;
     }
 }
@@ -6521,7 +5949,6 @@ class MUL extends Statement {
         super(preInstructionCallback, postInstructionCallback, tokens[env.index], env);
 
         this.GetParameterStatements(tokens, env);
-        //this.Right = new IdentifierStatement(preInstructionCallback, postInstructionCallback, null, env, null, null);
 
         if (this.parameters.length == 1)
             this.parameters.splice(0, 0, this.ARegisterHelper(this.parameters[0].TargetSize << 1, env));
@@ -6564,9 +5991,7 @@ class IMUL extends Statement {
         }
         if (this.parameters.length == 1) //If only one param then dest is A register.
             this.parameters.splice(0, 0, this.ARegisterHelper(this.parameters[0].TargetSize << 1, env));
-        //if (this.parameters.length == 2) //If only one param then dest is A register.
-        //    this.parameters.splice(0, 0, this.ARegisterHelper(this.parameters[0].TargetSize << 1, env));
-
+        
         if (this.parameters[0].TargetIsPointer) {
             this.Program.failedToken = this.Token;
             throw new Error("Error: IMUL destination must be a register.  near: " + this.Program.failedToken.Value + "\nLine: " + this.Program.GetErrorLine());
@@ -6611,7 +6036,6 @@ class IMUL extends Statement {
         if (this.parameters[1].TargetIsPointer)
             source2.Value = this.Program.Mem.ReadMemoryNumber(source2.Value, ssize);
 
-        //target.Value.multiply(source.Value);
         value = source1.Value.multiply(source2.Value);
 
         switch (tsize) {
@@ -6655,7 +6079,6 @@ class IMUL extends Statement {
         if (this.parameters.length == 3)
             this.AssignValueToTarget(value, target.DataSize);
 
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value, source.Value, target.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -6678,7 +6101,6 @@ class DIV extends Statement {
         var target: EvaluatedResult = this.parameters[0].Evaluate();
         var source: EvaluatedResult = this.parameters[1].Evaluate();
 
-        //var tsize = Statement.Size(target.DataSize, this.parameters[0], source.DataSize, this.parameters[1]);
         var ssize = Statement.Size(source.DataSize, this.parameters[1], target.DataSize, this.parameters[0]);
         if (this.parameters[1].TargetIsPointer)
             source.Value = this.Program.Mem.ReadMemoryNumber(source.Value, ssize);
@@ -6709,8 +6131,6 @@ class DIV extends Statement {
 
         var result = new EvaluatedResult(target.Name, value, target.DataSize);
 
-        //if (this.AssignValueToTarget(value, tsize)) {
-        //}
         this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value, source.Value, target.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
@@ -6736,7 +6156,6 @@ class IDIV extends Statement {
         var target: EvaluatedResult = this.parameters[0].Evaluate();
         var source: EvaluatedResult = this.parameters[1].Evaluate();
 
-        //var tsize = Statement.Size(target.DataSize, this.parameters[0], source.DataSize, this.parameters[1]);
         var ssize = Statement.Size(source.DataSize, this.parameters[1], target.DataSize, this.parameters[0]);
         if (this.parameters[1].TargetIsPointer)
             source.Value = this.Program.Mem.ReadMemoryNumber(source.Value, ssize);
@@ -6768,8 +6187,6 @@ class IDIV extends Statement {
 
         var result = new EvaluatedResult(target.Name, value, target.DataSize);
 
-        //if (this.AssignValueToTarget(value, tsize)) {
-        //}
         this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value, source.Value, target.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
@@ -6867,8 +6284,6 @@ class XCHG extends Statement {
         super(preInstructionCallback, postInstructionCallback, tokens[env.index], env);
 
         this.GetParameterStatements(tokens, env);
-
-        //env.index++;
     }
 
     public Evaluate(): EvaluatedResult {
@@ -6887,7 +6302,6 @@ class XCHG extends Statement {
 
         if (this.AssignValueToTarget(source.Value, ssize)) { }
         if (this.AssignValueToTarget(target.Value, tsize, this.parameters[1])) { }
-        //this.Program.Regs.RFlags.SetFlags(target.DataSize, source.Value);
 
         this.Program.postInstructionCallback(this, source);
         return source;
@@ -6901,7 +6315,6 @@ class BSWAP extends Statement {
         
         this.GetParameterStatements(tokens, env);
 
-        //env.index++;
     }
 
     public Evaluate(): EvaluatedResult {
@@ -6937,7 +6350,6 @@ class BSWAP extends Statement {
 
 
         if (this.AssignValueToTarget(source.Value, source.DataSize)) { }
-        //this.Program.Regs.RFlags.SetFlags(target.DataSize, source.Value);
 
         this.Program.postInstructionCallback(this, source);
         return source;
@@ -6996,8 +6408,6 @@ class TEST extends Statement {
 
         var value = target.Value.and(source.Value);
         var result = new EvaluatedResult(target.Name, value, target.DataSize);
-
-        //if (this.AssignValueToTarget(value, tsize)) { }
 
         this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value, source.Value, target.Value);
         this.Program.postInstructionCallback(this, result);
@@ -7146,13 +6556,9 @@ class JMP extends Statement {
 
 
         if (this.MeetsCondition()) {
-            //if (this.AssignValueToTarget(source.Value, source.DataSize)) { }
-
-            //this.Program.Labels
-
+            
             this.Program.Regs.IP.E = source.Value;
 
-            //this.Program.Regs.RFlags.SetFlags(target.DataSize, source.Value);
         }
         this.Program.postInstructionCallback(this, source);
         return source;
@@ -7261,13 +6667,9 @@ class LOOP extends Statement {
 
 
         if (!this.Program.Regs.C.E.equals(Long.UZERO) && this.MeetsCondition()) {
-            //if (this.AssignValueToTarget(source.Value, source.DataSize)) { }
-
-            //this.Program.Labels
-
+            
             this.Program.Regs.IP.E = source.Value;
 
-            //this.Program.Regs.RFlags.SetFlags(target.DataSize, source.Value);
         }
         this.Program.postInstructionCallback(this, source);
         return source;
@@ -7738,9 +7140,6 @@ class BT extends Statement {
         }
 
         var value = targetval;
-        //var CF : boolean = (uint)(src >> (int)dst) & 1;
-
-        //var isCarry: boolean = (value & (1 << source.Value - 1)) != 0;
         var isCarry: boolean = !(value.and(Long.UONE.shiftLeft(source.Value.decrement().getLowBits()))).equals(Long.UZERO);
 
 
@@ -7785,7 +7184,6 @@ class BTS extends Statement {
         }
 
         var value = targetval;
-        //var CF : boolean = (uint)(src >> (int)dst) & 1;
 
         var isCarry: boolean = !(value.and(Long.UONE.shiftLeft(source.Value.decrement().getLowBits()))).equals(Long.UZERO);
 
@@ -7842,7 +7240,6 @@ class BTR extends Statement {
         }
 
         var value = targetval;
-        //var CF : boolean = (uint)(src >> (int)dst) & 1;
 
         var isCarry: boolean = !(value.and(Long.UONE.shiftLeft(source.Value.decrement().getLowBits()))).equals(Long.UZERO);
 
@@ -7926,20 +7323,11 @@ class CPUID extends Statement {
     constructor(preInstructionCallback: Function, postInstructionCallback: Function, tokens: Token[], env: Program = null) {
         super(preInstructionCallback, postInstructionCallback, tokens[env.index], env);
 
-        //No Parameters.
-        //this.GetParameterStatements(tokens, env);
     }
 
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         
-        //this.AssignValueToTarget(value, tsize);
-
-        //var result = new EvaluatedResult(target.Name, isCarry, target.DataSize);
-
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
-        //this.Program.Regs.RFlags.CF = isCarry;
-
         switch (this.Program.Regs.A.E.getLowBits()) {
             case 0:
                 this.Program.Regs.A.E = Long.UZERO; //Highest basic function input value understood by CPUID;
@@ -8216,20 +7604,10 @@ class INT extends Statement {
         this.Program.preInstructionCallback(this);
 
         var target: EvaluatedResult = this.parameters[0].Evaluate();
-        //var source: EvaluatedResult = this.parameters[1].Evaluate();
-
-        //var size = Statement.Size(target.DataSize, this.parameters[0].TargetIsRegister, source.DataSize, this.parameters[1].TargetIsRegister);
-        //if (!this.parameters[1].TargetIsRegister)
-        //    source.Value = this.Program.Mem.ReadMemoryNumber(source.Value, size);
-
-        //var targetval = target.Value;
-
+        
         this.Program.interruptTable[target.Value.getLowBits()](this.Program);
 
         var result = new EvaluatedResult(target.Name, target.Value, target.DataSize);
-
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
-        //this.Program.Regs.RFlags.CF = isCarry;
 
         //interruptTable
 
@@ -8257,7 +7635,6 @@ class LODS extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult();
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         
         switch (this.size) {
             case 1:
@@ -8313,7 +7690,6 @@ class STOS extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult();
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
 
         switch (this.size) {
             case 1:
@@ -8366,9 +7742,6 @@ class REP extends Statement {
 
         this.instruction = this.Program.mnemonicBuilders[mnemonic](this.Program, t);
 
-        //ins.Address = new Long(this.Program.InstructionCount);
-        //this.Program.InstructionCount += 4;
-
         if (reptype.toUpperCase() == "REPE" ||
             reptype.toUpperCase() == "REPZ" ||
             reptype.toUpperCase() == "REPNE" ||
@@ -8415,7 +7788,6 @@ class REP extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult("REP " + this.instruction.FriendlyName);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         
         while (!this.meetsBreakCondition(this.size)) {
             this.instruction.Evaluate().DataSize;
@@ -8454,9 +7826,6 @@ class REP extends Statement {
 
 
         switch (this.repType) {
-            //case "":
-            //case null:
-            //case "REP":
             case "REPE":
             case "REPZ":
                 if (!this.Program.Regs.RFlags.ZF)
@@ -8493,7 +7862,6 @@ class MOVS extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult();
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
 
         var data : Long = null;
 
@@ -8818,7 +8186,6 @@ class SETcc extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult();
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
 
         var val: Long = Long.UZERO.copy(); 
 
@@ -8963,7 +8330,6 @@ class CLD extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult("CLD", 0, 1);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.Regs.RFlags.DF = false;
         this.Program.postInstructionCallback(this, result);
         return result;
@@ -8981,7 +8347,6 @@ class STD extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult("STD", 1, 1);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.Regs.RFlags.DF = true;
         this.Program.postInstructionCallback(this, result);
         return result;
@@ -8999,7 +8364,6 @@ class CLC extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult("CLC", 0, 1);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.Regs.RFlags.CF = false;
         this.Program.postInstructionCallback(this, result);
         return result;
@@ -9017,7 +8381,6 @@ class STC extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult("CLC", 1, 1);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.Regs.RFlags.CF = true;
         this.Program.postInstructionCallback(this, result);
         return result;
@@ -9035,7 +8398,6 @@ class CLI extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult("CLI", 0, 1);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.Regs.RFlags.IF = false;
         this.Program.postInstructionCallback(this, result);
         return result;
@@ -9053,7 +8415,6 @@ class STI extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult("STI", 1, 1);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.Regs.RFlags.IF = true;
         this.Program.postInstructionCallback(this, result);
         return result;
@@ -9071,7 +8432,6 @@ class CLAC extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult("CLAC", 0, 1);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.Regs.RFlags.AC = false;
         this.Program.postInstructionCallback(this, result);
         return result;
@@ -9089,7 +8449,6 @@ class STAC extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult("STAC", 1, 1);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.Regs.RFlags.AC = true;
         this.Program.postInstructionCallback(this, result);
         return result;
@@ -9165,7 +8524,6 @@ class CMC extends Statement {
         this.Program.preInstructionCallback(this);
         this.Program.Regs.RFlags.CF = !this.Program.Regs.RFlags.CF;
         var result = new EvaluatedResult("CMC", this.Program.Regs.RFlags.CF, 1);
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -9176,7 +8534,6 @@ class BSF extends Statement {
 
     constructor(preInstructionCallback: Function, postInstructionCallback: Function, t: Token[], env: Program = null) {
         super(preInstructionCallback, postInstructionCallback, t[env.index - 1], env);
-        //env.index++;
 
         this.GetParameterStatements(t, env);
 
@@ -9227,7 +8584,6 @@ class BSF extends Statement {
             result = new EvaluatedResult("BSF", count, tsize);
         }
 
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -9238,7 +8594,6 @@ class BSR extends Statement {
 
     constructor(preInstructionCallback: Function, postInstructionCallback: Function, t: Token[], env: Program = null) {
         super(preInstructionCallback, postInstructionCallback, t[env.index - 1], env);
-        //env.index++;
 
         this.GetParameterStatements(t, env);
 
@@ -9292,7 +8647,6 @@ class BSR extends Statement {
             result = new EvaluatedResult("BSR", count, tsize);
         }
 
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -9394,7 +8748,6 @@ class ENTER extends Statement {
             this.Program.Regs.SP.X = this.Program.Regs.SP.X.subtract(Long.fromInt( AllocSize));
         }
 
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -9435,7 +8788,6 @@ class LEAVE extends Statement {
             this.Program.Regs.BP.X = POP.Pop(this.Program, 2);
         }
 
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
         this.Program.postInstructionCallback(this, result);
         return result;
     }
@@ -9453,7 +8805,6 @@ class LAHF extends Statement {
     public Evaluate(): EvaluatedResult {
         this.Program.preInstructionCallback(this);
         var result = new EvaluatedResult();
-        //this.Program.Regs.RFlags.SetFlags(result.DataSize, result.Value);
 
         this.Program.Regs.A.H = this.Program.Regs.RFlags.SaveFlags().maskLowBitsAnd(0xFF);
         //AH ← EFLAGS(SF: ZF: 0: AF: 0: PF: 1: CF)
@@ -9491,15 +8842,10 @@ class CMPXCHG extends Statement {
 
     constructor(preInstructionCallback: Function, postInstructionCallback: Function, t: Token[], env: Program = null, numofbytes: number = 0) {
         super(preInstructionCallback, postInstructionCallback, t[env.index - 1], env);
-        //env.index++;
         this.size = numofbytes;
 
         this.GetParameterStatements(t, env);
 
-        //if (this.parameters.length != 2) {
-        //    this.Program.failedToken = this.Token;
-        //    throw new Error("Error: BSR requires two parameters. near: " + this.Program.failedToken.Value + "\nLine: " + this.Program.GetErrorLine());
-        //}
     }
 
     public Evaluate(): EvaluatedResult {
