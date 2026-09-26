@@ -2,7 +2,7 @@
 A x64 assembly emulator (assembler + CPU) in TypeScript. [Try it live](https://fromthe.blue/x64Emu/index.html)
 
 ![screenshot](ReadmeAttachments/msedge_vyKiGbjzHf.png)
-![screenshot](ReadmeAttachments/runSample%20[x265].mp4)
+[video](ReadmeAttachments/runSample%20[x265].mp4)
 
 This Interpreter and Emulator loads an assembly language program and executes it. Written using a modified version of [Long.js](https://github.com/dcodeIO/long.js) to handle working with 64-bit numbers in Javascript, which only handles 54 bit integer operations (The price of having no actual types).
 
